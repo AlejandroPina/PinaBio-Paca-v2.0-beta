@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.4`
+# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.5`
 
 This is a design-review specification, not a validated schematic or manufacturing release. PinaBio is for experimental research and biofeedback, not medical use or diagnosis.
 
@@ -10,16 +10,20 @@ LiPo 1S protected → BQ24074 → TPS63070 → one nominal `3V3_SYS` rail. An in
 
 ## USB, switch and body connections
 
-USB-C is a USB 2.0 sink: CC1/CC2 have 5.1 kΩ Rd resistors, D+/D− have low-capacitance ESD and connect to GPIO19/20. A high-side VBUS MOSFET, commanded by the physical switch, passes VBUS to BQ24074 only when OFF. Its orientation must block intrinsic-diode bypass.
+USB-C is a USB 2.0 sink: CC1/CC2 have 5.1 kΩ Rd resistors; D+/D− have low-capacitance ESD and connect to GPIO19/20. Protected VBUS reaches BQ24074 IN in both switch positions. There is no external VBUS-cutoff MOSFET. The physical switch sets the charger mode pins and regulator enable independently of the ESP32.
 
-| Switch | USB | Board source | LiPo charge | USB data | Body paths |
-|---|---:|---|---|---|---|
-| OFF | no | none | no | no | open |
-| OFF | yes | USB through BQ24074 | yes | yes, programming | open |
-| ON | no | LiPo | no | no | armable |
-| ON | yes | LiPo | no | yes | armable only with an external USB isolator |
+With OFF and valid VBUS, `EN1=high`, `EN2=low` and `CE=low` allow charging and USB-powered OUT; USB500 is permitted only when the source supports that current. With ON and valid VBUS, `EN1=EN2=high` select standby/USB suspend: internal `Q1` (IN→OUT) is open, `Q2` (BAT→OUT) is closed and charging stops. `CE=high` adds charge inhibition but cannot alone prevent USB from powering OUT. EN1, EN2 and CE must be driven by the physical switch and VBUS, remain defined with no battery, and never rely on firmware. ILIM, ISET and ITERM are sized for the actual USB source, cell and initial ≈300 mA charge target; TS connects to the cell NTC.
 
-With OFF, USB powers the ESP for programming and charges the cell; removing USB powers the board down. With ON, VBUS is blocked from the charger while D+/D− remain available. Body connectors use normally-open contacts for every conductor, including power, ground and each signal. Closing requires ON, power-good, self-test and physical feedback; firmware cannot override the barrier.
+The TPS63070 hardware enable must implement `(OFF and valid VBUS) or (ON and valid battery)`. This permits OFF+USB programming without a battery while preventing ON+USB from starting without one. The schematic must define the battery-valid condition and open all body contacts before changing from battery power to USB power on an ON→OFF transition. [TI BQ24074 datasheet](https://www.ti.com/lit/ds/symlink/bq24074.pdf), Table 7-2 and Section 9.3.2.
+
+| Switch | USB | BQ24074 mode | Board source | LiPo charge | USB data | Body paths |
+|---|---:|---|---|---|---|---|
+| OFF | no | invalid input | none | no | no | open |
+| OFF | yes | USB500 if source permits | USB through BQ24074 | yes | yes, programming | open |
+| ON | no | invalid input | LiPo | no | no | armable |
+| ON | yes | standby, `EN1=EN2=high` | LiPo | no | yes | armable only with an external USB isolator |
+
+With OFF, USB powers the ESP for programming and charges the cell; removing USB powers the board down. With ON, D+/D− remain available and OUT is battery powered even though VBUS remains at charger IN. Body connectors use normally-open contacts for every conductor, including power, ground and each signal. Closing requires ON, power-good, self-test and physical feedback; firmware cannot override the barrier.
 
 An external host-powered USB isolator is mandatory for use with a person while USB is connected. The board USB ground is not cut; isolation belongs in the external cable. Firmware can report USB presence but cannot prove that an isolator is fitted. A normal USB cable must not be used on a person.
 
@@ -37,4 +41,4 @@ The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OP
 
 ## Mandatory verification
 
-Measure every breakout; test all four USB/switch states including no battery; prove VBUS/D+/D− cannot back-power ON-without-battery; measure 3.3 V ripple and load; prove opening of every body conductor under GPIO failure; test GSR fault current, ECG range/noise, external buses and USB-isolator behaviour. KiCad capture, BOM, independent body-path review and these results are required before manufacture.
+Measure every breakout; test all four USB/switch states including no battery; prove ON+USB leaves OUT on BAT with zero charge current and VBUS/D+/D− cannot back-power ON-without-battery. Measure switch/USB transients and prove body contacts open before USB can power the system. Measure 3.3 V ripple and load; prove opening of every body conductor under GPIO failure; test GSR fault current, ECG range/noise, external buses and USB-isolator behaviour. KiCad capture, BOM, independent body-path review and these results are required before manufacture.

@@ -1,6 +1,10 @@
+<p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
+
 # PinaBio Paca v2.0 beta — revisión documental
 
-Este conjunto sustituye la documentación que describía dos diseños incompatibles. Define una LiPo 1S con BQ24074 y un único raíl de 3,3 V, carga/programación USB con el interruptor OFF y datos USB con la placa ON solo mediante aislador externo alimentado desde el host cuando haya una persona conectada.
+[English](README.en.md)
+
+Este conjunto define una LiPo 1S con BQ24074 y un único raíl de 3,3 V. Con el interruptor OFF y USB conectado se carga la batería y se permite programar. Con ON y USB, el modo standby del BQ24074 deja el sistema alimentado por la batería y detiene la carga; USB transporta datos, y requiere un aislador externo alimentado desde el host cuando haya una persona conectada.
 
 La placa registra ECG, PPG, GSR, dos bandas respiratorias, temperatura local y batería. Es un diseño experimental de biofeedback, no un dispositivo médico.
 

@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.4`
+# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.5`
 
 [Portada](../../README.md) · [Alimentación y USB](alimentacion-usb.md) · [Protocolo](protocolo.md)
 
@@ -9,9 +9,9 @@
 PinaBio registra ECG, PPG, GSR, dos bandas de respiración, temperatura local y tensión de batería. El ESP32-S3-MINI-1U-N8 coordina dos ADS122C04, los módulos I²C y BLE; Wi‑Fi permanece desactivado. Un ADS se dedica al ECG y el segundo a GSR, tórax y abdomen. La aplicación conserva muestras crudas y calcula métricas derivadas; ninguna señal constituye diagnóstico.
 
 ```text
-USB-C ─ ESD ─ MOSFET VBUS ─ BQ24074 ─ SYS ─ TPS63070 ─ 3V3_SYS
-                         │                         ├─ ESP32-S3 / BLE / ADS122C04 ×2
-LiPo 1S protegida ───────┘                         └─ isla analógica 3V3_A (0 Ω inicial)
+USB-C ─ ESD ─ BQ24074 IN/OUT ─ SYS ─ TPS63070 ─ 3V3_SYS
+                   │                       ├─ ESP32-S3 / BLE / ADS122C04 ×2
+LiPo 1S protegida ─┘ BAT                   └─ isla analógica 3V3_A (0 Ω inicial)
 
 AD8232 ─ ADS ECG (600 SPS)       MAX30102 ─ I²C + INT
 GSR / tórax / abdomen ─ MCP6004 ─ ADS lento       MAX30205 ─ I²C
@@ -30,18 +30,20 @@ Hay un solo raíl nominal de 3,3 V. `3V3_A` es una isla filtrable desde `3V3_SYS
 | `3V3_A` | Desde 3V3_SYS mediante 0 Ω/ferrita opcional | ADS analógico, MCP6004 y AD8232. |
 | `0V5_EXC` | MCP6004 desde 56 kΩ/10 kΩ de 3V3_A | ≈0,50 V; calibrar por placa. |
 
-USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa, D+/D− tienen ESD de baja capacidad y van a GPIO19/GPIO20. El conector nunca recibe VBUS desde la placa. El interruptor solo gobierna el MOSFET de VBUS, no la corriente de carga. Con OFF, VBUS alcanza el BQ24074; con ON queda bloqueado. El MOSFET debe impedir conducción por su diodo interno y la entrada del BQ24074 queda definida por 100 kΩ a masa al bloquearse.
+USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa, D+/D− tienen ESD de baja capacidad y van a GPIO19/GPIO20. El conector nunca recibe VBUS desde la placa. VBUS protegido llega a `IN` del BQ24074 con OFF y con ON; no hay MOSFET externo de corte. El interruptor físico fija los pines de modo del cargador y la habilitación del regulador sin depender del ESP32.
 
-`EN1` alto y `EN2` a masa seleccionan límite USB de 500 mA; `CE` a masa, `ILIM` e `ISET` se calculan para una carga prevista de ≈300 mA y `TS` se conecta al NTC. Ninguno de esos pines se deja flotante.
+Con OFF y VBUS válido: `EN1=alto`, `EN2=bajo`, `CE=bajo` permiten carga y salida desde USB, con límite USB500 solo si la fuente lo admite. Con ON y VBUS válido: `EN1=EN2=alto` ponen el BQ24074 en *standby/USB suspend*: `Q1` interno (IN→OUT) abierto, `Q2` (BAT→OUT) cerrado y carga detenida. `CE=alto` añade inhibición de carga, pero no basta por sí solo para evitar que USB alimente `OUT`. Los niveles de `EN1`, `EN2` y `CE` deben provenir del interruptor y VBUS, seguir definidos sin batería y no depender de firmware. `ILIM`, `ISET` e `ITERM` se calculan para la fuente, LiPo y carga prevista de ≈300 mA; `TS` va al NTC.
 
-| Interruptor | USB | Fuente de 3V3 | Carga | USB datos/programación | Conexiones corporales |
-|---|---:|---|---|---|---|
-| OFF | no | ninguna | no | no | abiertas |
-| OFF | sí | VBUS vía BQ24074 | sí | sí | abiertas |
-| ON | no | LiPo | no | no | armables |
-| ON | sí | LiPo | no | sí | armables solo con aislador USB externo |
+La habilitación del TPS63070 debe obedecer por hardware a `(OFF y VBUS válido) o (ON y batería válida)`. Así OFF+USB admite programación sin batería, mientras ON+USB sin batería no arranca. El esquema debe definir la detección de batería válida y secuenciar la apertura de contactos corporales antes de pasar de alimentación por batería a USB al mover ON→OFF. [Hoja de datos BQ24074 de TI](https://www.ti.com/lit/ds/symlink/bq24074.pdf), tabla 7-2 y apartado 9.3.2.
 
-Con OFF y USB, el ESP puede arrancar para programarse; al retirar USB queda apagado. Con ON y USB, D+/D− continúan funcionando pero VBUS no carga ni alimenta la placa. Para medir con USB conectado se requiere un aislador externo alimentado desde el ordenador; la masa del conector de placa no se corta, pues el retorno de datos forma parte de ese aislamiento externo. Un cable USB normal no debe usarse sobre una persona.
+| Interruptor | USB | Modo BQ24074 | Fuente de 3V3 | Carga | USB datos/programación | Conexiones corporales |
+|---|---:|---|---|---|---|---|
+| OFF | no | entrada inválida | ninguna | no | no | abiertas |
+| OFF | sí | USB500, si fuente válida | VBUS vía BQ24074 | sí | sí | abiertas |
+| ON | no | entrada inválida | LiPo | no | no | armables |
+| ON | sí | standby, `EN1=EN2=alto` | LiPo | no | sí | armables solo con aislador USB externo |
+
+Con OFF y USB, el ESP puede arrancar para programarse; al retirar USB queda apagado. Con ON y USB, D+/D− continúan funcionando y `OUT` se alimenta de la batería, aunque VBUS permanece en `IN` del cargador. Para medir con USB conectado se requiere un aislador externo alimentado desde el ordenador; la masa del conector de placa no se corta, pues el retorno de datos forma parte de ese aislamiento externo. Un cable USB normal no debe usarse sobre una persona.
 
 ## 3. Barrera corporal
 
@@ -66,7 +68,7 @@ I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GP
 ## 5. Verificación obligatoria
 
 1. Fotografiar y medir cada breakout: pinout, reguladores, *pull-ups*, consumo y dimensiones.
-2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: D+/D− y VBUS no pueden elevar 3V3 cuando ON y la batería falta.
+2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir las transiciones de interruptor y USB, y comprobar que los contactos corporales se abren antes de que USB pueda alimentar el sistema.
 3. Medir 3V3 en ESP y MAX30205, rizado, picos BLE/PPG y carga del BQ24074.
 4. Confirmar apertura de cada conductor corporal, masa incluida, con firmware fallado o GPIO atascado.
 5. Demostrar limitación GSR ante corto y ausencia de bypass de los 100 kΩ.

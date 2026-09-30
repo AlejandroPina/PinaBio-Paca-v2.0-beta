@@ -2,7 +2,7 @@
 
 [Home](../../README.en.md) · [Hardware specification](specification.md)
 
-One USB-C connector, a protected 1S LiPo, a BQ24074 power path and a TPS63070 at 3.295 V. A TLV75530 makes 3.0 V only for the CJMCU-30205. The physical switch controls the BQ24074 mode and the regulator enable; firmware does not choose the charging or system power source.
+One USB-C connector, a protected 1S LiPo, a BQ24074 power path and a TPS63070 at 3.295 V. A TLV75530PDBVR makes 3.0 V only for the CJMCU-30205. The physical switch controls the BQ24074 mode and the regulator enable; firmware does not choose the charging or system power source.
 
 With **OFF and USB**, `EN1=high`, `EN2=low` and `CE=low` select USB500 mode. Valid `IN` powers `OUT` and charges the cell; TPS63070 can power the ESP32 for programming. All body paths remain open. Select the 500 mA input limit only when the USB source permits it. The initial battery-charge target is about 300 mA; measure the simultaneous system load during programming.
 
@@ -25,7 +25,7 @@ Without USB, IN is invalid and OUT follows the battery. ON enables TPS63070; OFF
 - With ON, USB and no battery, standby must prevent OUT from powering the board from USB. The regulator must not start without a valid battery. With OFF, USB and no battery, programming may start.
 - Select ILIM, ISET, ITERM, TMR and TS for the actual USB source, cell and NTC. BQ24074 has no SYSOFF pin and does not replace cell protection.
 - Body contacts must open before the BQ24074 can change from battery to USB supply when moving ON→OFF. Hardware timing and verification remain schematic requirements; firmware timing alone is insufficient.
-- TPS63070 runs in forced PWM. Feedback divider: 49.9 kΩ from VOUT to FB and 16.0 kΩ from FB to ground, both 0.1 %. Setpoint 3.295 V. PS/SYNC tied low. The TLV75530, with 1 µF at input and output, makes 3.0 V only for the CJMCU-30205 VCC. Start the analogue-island feed with 0 Ω.
+- TPS63070 runs in forced PWM. Feedback divider: 49.9 kΩ from VOUT to FB and 16.0 kΩ from FB to ground, both 0.1 %. Setpoint 3.295 V. PS/SYNC tied low. The TLV75530PDBVR, with 2.2 µF X7R at input and output, makes 3.0 V only for the CJMCU-30205 VCC. Those capacitors keep at least 0.47 µF of effective capacitance. Start the analogue-island feed with 0 Ω.
 - USB-C has ESD protection and separate 5.1 kΩ Rd resistors on CC1/CC2. D+/D− and VBUS detection must not back-power an off ESP32. The external isolator must create its board-side isolated VBUS from the host.
 
 ## Acceptance tests

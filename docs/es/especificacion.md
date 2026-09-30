@@ -12,13 +12,13 @@ PinaBio registra ECG, PPG, GSR, dos bandas de respiración, temperatura local y 
 USB-C ─ ESD ─ BQ24074 IN/OUT ─ SYS ─ TPS63070 ─ 3V3_SYS
                    │                       ├─ ESP32-S3 / BLE / ADS122C04 ×2
 LiPo 1S protegida ─┘ BAT                   ├─ isla analógica 3V3_A (0 Ω inicial)
-                                              └─ TLV75530 ─ 3V0_TEMP ─ CJMCU-30205
+                                              └─ TLV75530PDBVR ─ 3V0_TEMP ─ CJMCU-30205
 
 AD8232 ─ ADS ECG (600 SPS)       MAX30102 ─ I²C + INT
 GSR / tórax / abdomen ─ MCP6004 ─ ADS lento       MAX30205 ─ I²C
 ```
 
-El TPS63070, en PWM forzado, genera el raíl de 3,30 V nominales (consigna 3,295 V). `3V3_A` es una isla filtrable desde `3V3_SYS`, inicialmente puenteada con 0 Ω. **No hay regulador de 2,9 V ni TCA9801.** Un segundo regulador, el TLV75530, hace 3,0 V fijos y solo alimenta el VCC del CJMCU-30205. El resto de la placa va al raíl de 3,3 V.
+El TPS63070, en PWM forzado, genera el raíl de 3,30 V nominales (consigna 3,295 V). `3V3_A` es una isla filtrable desde `3V3_SYS`, inicialmente puenteada con 0 Ω. **No hay regulador de 2,9 V ni TCA9801.** Un segundo regulador, el TLV75530PDBVR, hace 3,0 V fijos y solo alimenta el VCC del CJMCU-30205. El resto de la placa va al raíl de 3,3 V.
 
 ## 2. Alimentación y USB
 
@@ -29,7 +29,7 @@ El TPS63070, en PWM forzado, genera el raíl de 3,30 V nominales (consigna 3,295
 | `SYS` | Salida del BQ24074 → TPS63070 | El BQ24074 aporta *power-path*, no 3,3 V regulados. |
 | `3V3_SYS` | TPS63070. FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, ambas al 0,1 %. PS/SYNC a masa. | 3,295 V nominales. ESP32, ADC, PPG, lógica y la entrada del LDO. Diseñar ≥500 mA y medir picos BLE, PPG y contactos. |
 | `3V3_A` | Desde 3V3_SYS mediante 0 Ω/ferrita opcional | ADS analógico, MCP6004 y AD8232. |
-| `3V0_TEMP` | TLV75530 desde 3V3_SYS. 1 µF en entrada y en salida. EN unido a su entrada. | Solo el VCC del CJMCU-30205. |
+| `3V0_TEMP` | TLV75530PDBVR desde 3V3_SYS. 2,2 µF X7R en entrada y en salida, para conservar al menos 0,47 µF efectivos. EN unido a su entrada. | Solo el VCC del CJMCU-30205. |
 | `0V5_EXC` | MCP6004 desde 56 kΩ/10 kΩ de 3V3_A | ≈0,50 V; calibrar por placa. |
 
 USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa, D+/D− tienen ESD de baja capacidad y van a GPIO19/GPIO20. El conector nunca recibe VBUS desde la placa. VBUS protegido llega a `IN` del BQ24074 con OFF y con ON; no hay MOSFET externo de corte. El interruptor físico fija los pines de modo del cargador y la habilitación del regulador sin depender del ESP32.
@@ -59,7 +59,7 @@ No se admiten rutas alternativas por blindajes, ESD, *pull-ups*, diodos de GPIO,
 
 | Conector / señal | Interfaz | Requisitos eléctricos |
 |---|---|---|
-| AD8232 externo | 3V3, GND, OUTPUT, LO+, LO−, SDN | Verificar breakout a 3,3 V. ADS ECG: referencia interna 2,048 V, PGA bypass, ganancia 1, 600 SPS. Divisor: 33,2 kΩ desde OUTPUT y 47,5 kΩ a masa, al 1 %. A 3,30 V de salida plena el ADS ve 1,94 V; a 3,40 V ve 2,00 V, por debajo de 2,048 V. No usar 20,0/40,2 kΩ. La medida de la excursión real comprueba que no recorta. |
+| AD8232 externo | 3V3, GND, OUTPUT, LO+, LO−, SDN | Verificar breakout a 3,3 V. ADS ECG: referencia interna 2,048 V, PGA bypass, ganancia 1, 600 SPS. Divisor: 33,2 kΩ desde OUTPUT y 47,5 kΩ a masa, al 1 %. A 3,30 V de salida plena el ADS ve 1,94 V; a 3,40 V ve 2,00 V, por debajo de 2,048 V. No usar 20,0/40,2 kΩ. La medida de la excursión real comprueba que el módulo no recorta antes del divisor. Si OUTPUT ya sale recortada, el divisor no lo corrige. |
 | MAX30102/GY-30102 | 3V3, GND, SCL, SDA, INT | Verificar reguladores, niveles, *pull-ups*, LED y consumo del módulo real. PPG inicialmente 200 pares/s. |
 | CJMCU-30205 | 3V0_TEMP, GND, SDA, SCL, OS, A0, A1, A2 | VCC del módulo va directo al chip: no lleva regulador. A0, A1 y A2 a masa fijan 0x48. Las pull-up del módulo van a su VCC. |
 | GSR | Dos electrodos | `0V5_EXC → 100 kΩ → sensor → retorno`; seguidor MCP6004 y ADS lento. Corriente de cortocircuito ≈5 µA. |

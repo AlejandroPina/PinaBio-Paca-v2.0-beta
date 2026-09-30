@@ -2,7 +2,7 @@
 
 [Portada](../../README.md) · [Especificación](especificacion.md)
 
-Hay un USB-C, una LiPo 1S protegida, un BQ24074 con *power-path* y un TPS63070 a 3,295 V y un TLV75530 a 3,0 V solo para el CJMCU-30205. El interruptor físico gobierna el modo del BQ24074 y la habilitación del regulador; el firmware no decide si se carga la batería o de dónde sale la energía del sistema.
+Hay un USB-C, una LiPo 1S protegida, un BQ24074 con *power-path* y un TPS63070 a 3,295 V y un TLV75530PDBVR a 3,0 V solo para el CJMCU-30205. El interruptor físico gobierna el modo del BQ24074 y la habilitación del regulador; el firmware no decide si se carga la batería o de dónde sale la energía del sistema.
 
 ## Funcionamiento
 
@@ -27,7 +27,7 @@ Sin USB, `IN` no es válido y `OUT` recibe energía de la batería. ON habilita 
 - Con **ON, USB y batería ausente**, `EN1=EN2=alto` debe impedir que `OUT` encienda la placa desde USB. El regulador debe permanecer apagado si no hay batería válida. Con **OFF, USB y batería ausente**, el regulador puede arrancar para programación.
 - `ILIM`, `ISET`, `ITERM`, `TMR` y `TS` se dimensionan según hoja de datos, fuente USB, NTC y LiPo reales. El BQ24074 no tiene pin `SYSOFF` ni sustituye la protección de la celda.
 - La lógica de los contactos corporales debe abrir todas las vías antes de que el BQ24074 pueda pasar de batería a USB al mover ON→OFF. El diseño de temporización y su ensayo quedan pendientes del esquema; no basta con confiar en firmware.
-- TPS63070 en PWM forzado. Divisor de FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, al 0,1 %. Consigna 3,295 V. PS/SYNC a masa. El TLV75530, con 1 µF a la entrada y 1 µF a la salida, hace 3,0 V solo para el VCC del CJMCU-30205.
+- TPS63070 en PWM forzado. Divisor de FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, al 0,1 %. Consigna 3,295 V. PS/SYNC a masa. El TLV75530PDBVR, con 2,2 µF X7R a la entrada y 2,2 µF X7R a la salida, hace 3,0 V solo para el VCC del CJMCU-30205. Esos condensadores dejan al menos 0,47 µF efectivos.
 - La isla analógica empieza con 0 Ω y se decide si lleva ferrita tras medir ruido.
 - USB-C usa ESD y dos resistencias `Rd` de 5,1 kΩ en CC1/CC2. D+/D− y la detección de VBUS no deben realimentar el ESP32 apagado. El aislador no está soldado a la placa y debe generar su VBUS aislado desde el host.
 

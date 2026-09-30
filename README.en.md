@@ -4,7 +4,7 @@
 
 [Español](README.md)
 
-This documentation defines a protected 1S LiPo, a BQ24074 and a single nominal 3.3 V rail. With the switch OFF and USB connected, the battery charges and the ESP32 can be programmed. With the switch ON and USB connected, the BQ24074 standby mode leaves the system powered from the battery and stops charging. USB can carry data; a host-powered external USB isolator is required whenever a person is connected.
+This documentation defines a protected 1S LiPo, a BQ24074 and a TPS63070 at 3.3 V and a 3.0 V LDO only for the temperature sensor. With the switch OFF and USB connected, the battery charges and the ESP32 can be programmed. With the switch ON and USB connected, the BQ24074 standby mode leaves the system powered from the battery and stops charging. USB can carry data; a host-powered external USB isolator is required whenever a person is connected.
 
 The board is designed to acquire ECG, PPG, GSR, two respiration bands, local temperature and battery voltage. It is an experimental biofeedback design, not a medical device.
 

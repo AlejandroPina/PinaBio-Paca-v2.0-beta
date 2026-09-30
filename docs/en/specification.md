@@ -6,7 +6,7 @@ This is a design-review specification, not a validated schematic or manufacturin
 
 The ESP32-S3-MINI-1U-N8 acquires ECG, PPG, GSR, thoracic and abdominal respiration bands, local temperature and battery voltage, then sends raw data over BLE with Wi‑Fi disabled. One ADS122C04 is dedicated to ECG; the other serves GSR and both bands. MAX30102 and MAX30205 are external I²C modules.
 
-LiPo 1S protected → BQ24074 → TPS63070 → one nominal `3V3_SYS` rail. An initially 0 Ω link may feed a `3V3_A` analogue island. There is **no 2.9 V rail, TPS7A20 or TCA9801**. TPS63070 uses forced PWM. Prototype measurements must keep MAX30205 supply within 3.0–3.3 V.
+LiPo 1S protected → BQ24074 → TPS63070 → nominal 3.295 V `3V3_SYS` (49.9 kΩ / 16.0 kΩ, 0.1 %, forced PWM). An initially 0 Ω link may feed a `3V3_A` analogue island. A TLV75530 makes `3V0_TEMP` only for the CJMCU-30205. There is **no 2.9 V rail, TPS7A20 or TCA9801**.
 
 ## USB, switch and body connections
 
@@ -33,11 +33,11 @@ An external host-powered USB isolator is mandatory for use with a person while U
 
 | Signal | Implementation and initial configuration |
 |---|---|
-| ECG | External AD8232, dedicated ADS122C04, internal 2.048 V reference, PGA bypass, gain 1, 600 SPS. Calculate the AD8232 output divider after measuring the 3.3 V-powered module; the former 20.0/40.2 kΩ divider is not accepted without that test. |
+| ECG | External AD8232, dedicated ADS122C04, internal 2.048 V reference, PGA bypass, gain 1, 600 SPS. Divider: 33.2 kΩ from OUTPUT and 47.5 kΩ to ground, 1 %. At a 3.30 V full-scale output the ADC sees 1.94 V; at 3.40 V it sees 2.00 V, under the 2.048 V reference. Do not use 20.0/40.2 kΩ. Measure the real swing to confirm it does not clip. |
 | GSR | MCP6004-buffered ≈0.50 V excitation; a physical 100 kΩ series resistor limits normal short-circuit current to ≈5 µA. |
 | Thorax / abdomen | One identical buffered front end each; measure real band ranges before freezing 100 kΩ and filters. |
 | PPG | External MAX30102/GY-30102, 3.3 V, I²C plus INT; validate its actual regulators, pull-ups, LED current and voltage levels. |
-| Temperature | External MAX30205 at 3.3 V, I²C address 0x48; validate pull-ups and local thermal behaviour. |
+| Temperature | CJMCU-30205 from `3V0_TEMP` only. Module VCC ties straight to the chip. A0, A1 and A2 to ground set address 0x48. |
 
 The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OPEN, SHORT, OUT_OF_RANGE and UNCALIBRATED rather than false values. Bands provide resistance and a derived respiratory curve, not lung volume. ADS IDACs remain disabled and never connect to body paths.
 

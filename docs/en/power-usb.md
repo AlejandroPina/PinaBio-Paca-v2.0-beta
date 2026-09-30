@@ -1,4 +1,4 @@
-# Power and USB — revision `PWR-0.5`
+# Power and USB — revision `PWR-0.6`
 
 [Home](../../README.en.md) · [Hardware specification](specification.md)
 
@@ -21,6 +21,7 @@ Without USB, IN is invalid and OUT follows the battery. ON enables TPS63070; OFF
 
 - Protected VBUS connects to BQ24074 IN in both switch positions. **Do not fit the external VBUS-cutoff MOSFET.** Place the IN and OUT capacitors required by TI.
 - EN1 must be high when VBUS is valid. EN2 and CE must be high with ON and VBUS, low with OFF and VBUS. The physical switch and bias network must establish these levels without the ESP32 or battery; no control input may float. Verify levels and sequencing when USB is inserted and the switch moves.
+- For EN1, EN2 and CE, TI specifies a **1.4–6 V** high level, a **0–0.4 V** low level and an **−0.3 to 7 V** absolute-maximum range. The 7 V limit is not a design target. The network deriving these signals from VBUS must limit their voltage during normal operation, insertion and foreseeable overvoltage, with margin below 6 V; do not connect raw VBUS directly without demonstrating compliance. The IN pin has a different, higher absolute maximum that does not protect the logic pins.
 - With ON, USB and no battery, standby must prevent OUT from powering the board from USB. The regulator must not start without a valid battery. With OFF, USB and no battery, programming may start.
 - Select ILIM, ISET, ITERM, TMR and TS for the actual USB source, cell and NTC. BQ24074 has no SYSOFF pin and does not replace cell protection.
 - Body contacts must open before the BQ24074 can change from battery to USB supply when moving ON→OFF. Hardware timing and verification remain schematic requirements; firmware timing alone is insufficient.
@@ -29,6 +30,6 @@ Without USB, IN is invalid and OUT follows the battery. ON enables TPS63070; OFF
 
 ## Acceptance tests
 
-Measure voltage and current at IN, OUT, BAT, 3V3_SYS and USB in all four states. With ON+USB, OUT must track the battery, charge current must be zero, and removing the battery must not start the board through VBUS or D+/D−. With OFF+USB, test charging and programming without a battery. Repeat during USB insertion/removal and switch movement; verify that body paths open before USB can power the system. Measure external-isolator performance, 3.3 V ripple, module current and charger temperature. Person-connected sessions remain unapproved until the results and contact tests are documented.
+Measure voltage and current at IN, OUT, BAT, 3V3_SYS and USB in all four states. Capture EN1, EN2 and CE with an oscilloscope in steady state and during USB insertion/removal, VBUS disturbances and switch movement; verify functional thresholds and absolute limits. With ON+USB, OUT must track the battery, charge current must be zero, and removing the battery must not start the board through VBUS or D+/D−. With OFF+USB, test charging and programming without a battery. Verify that body paths open before USB can power the system. Measure external-isolator performance, 3.3 V ripple, module current and charger temperature. Person-connected sessions remain unapproved until the results and contact tests are documented.
 
 [TI BQ24074 datasheet](https://www.ti.com/lit/ds/symlink/bq24074.pdf), Table 7-2 and Section 9.3.2.

@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.5`
+# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.6`
 
 This is a design-review specification, not a validated schematic or manufacturing release. PinaBio is for experimental research and biofeedback, not medical use or diagnosis.
 
@@ -13,6 +13,8 @@ LiPo 1S protected → BQ24074 → TPS63070 → one nominal `3V3_SYS` rail. An in
 USB-C is a USB 2.0 sink: CC1/CC2 have 5.1 kΩ Rd resistors; D+/D− have low-capacitance ESD and connect to GPIO19/20. Protected VBUS reaches BQ24074 IN in both switch positions. There is no external VBUS-cutoff MOSFET. The physical switch sets the charger mode pins and regulator enable independently of the ESP32.
 
 With OFF and valid VBUS, `EN1=high`, `EN2=low` and `CE=low` allow charging and USB-powered OUT; USB500 is permitted only when the source supports that current. With ON and valid VBUS, `EN1=EN2=high` select standby/USB suspend: internal `Q1` (IN→OUT) is open, `Q2` (BAT→OUT) is closed and charging stops. `CE=high` adds charge inhibition but cannot alone prevent USB from powering OUT. EN1, EN2 and CE must be driven by the physical switch and VBUS, remain defined with no battery, and never rely on firmware. ILIM, ISET and ITERM are sized for the actual USB source, cell and initial ≈300 mA charge target; TS connects to the cell NTC.
+
+The VBUS-derived logic must meet these limits at each EN1, EN2 and CE pin: low **0–0.4 V**, high **1.4–6 V**, absolute maximum **−0.3 to 7 V**, including transients. The schematic must provide the necessary voltage limiting/protection and operating margin below 6 V; 7 V is not a design target. The higher voltage tolerance at IN does not extend to these pins. See [power and USB](power-usb.md).
 
 The TPS63070 hardware enable must implement `(OFF and valid VBUS) or (ON and valid battery)`. This permits OFF+USB programming without a battery while preventing ON+USB from starting without one. The schematic must define the battery-valid condition and open all body contacts before changing from battery power to USB power on an ON→OFF transition. [TI BQ24074 datasheet](https://www.ti.com/lit/ds/symlink/bq24074.pdf), Table 7-2 and Section 9.3.2.
 
@@ -41,4 +43,4 @@ The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OP
 
 ## Mandatory verification
 
-Measure every breakout; test all four USB/switch states including no battery; prove ON+USB leaves OUT on BAT with zero charge current and VBUS/D+/D− cannot back-power ON-without-battery. Measure switch/USB transients and prove body contacts open before USB can power the system. Measure 3.3 V ripple and load; prove opening of every body conductor under GPIO failure; test GSR fault current, ECG range/noise, external buses and USB-isolator behaviour. KiCad capture, BOM, independent body-path review and these results are required before manufacture.
+Measure every breakout; test all four USB/switch states including no battery; prove ON+USB leaves OUT on BAT with zero charge current and VBUS/D+/D− cannot back-power ON-without-battery. Capture EN1, EN2 and CE during steady states and switch/USB transients to check their voltage limits, and prove body contacts open before USB can power the system. Measure 3.3 V ripple and load; prove opening of every body conductor under GPIO failure; test GSR fault current, ECG range/noise, external buses and USB-isolator behaviour. KiCad capture, BOM, independent body-path review and these results are required before manufacture.

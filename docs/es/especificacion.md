@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.5`
+# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.6`
 
 [Portada](../../README.md) · [Alimentación y USB](alimentacion-usb.md) · [Protocolo](protocolo.md)
 
@@ -34,6 +34,8 @@ USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa, D+/D− ti
 
 Con OFF y VBUS válido: `EN1=alto`, `EN2=bajo`, `CE=bajo` permiten carga y salida desde USB, con límite USB500 solo si la fuente lo admite. Con ON y VBUS válido: `EN1=EN2=alto` ponen el BQ24074 en *standby/USB suspend*: `Q1` interno (IN→OUT) abierto, `Q2` (BAT→OUT) cerrado y carga detenida. `CE=alto` añade inhibición de carga, pero no basta por sí solo para evitar que USB alimente `OUT`. Los niveles de `EN1`, `EN2` y `CE` deben provenir del interruptor y VBUS, seguir definidos sin batería y no depender de firmware. `ILIM`, `ISET` e `ITERM` se calculan para la fuente, LiPo y carga prevista de ≈300 mA; `TS` va al NTC.
 
+La lógica derivada de VBUS debe respetar en cada pin `EN1`, `EN2` y `CE`: bajo **0–0,4 V**, alto **1,4–6 V**, máximo absoluto **−0,3 a 7 V**, incluso durante transitorios. El esquema debe incluir la limitación/protección necesaria y margen respecto a 6 V en operación; los 7 V no son una consigna. La tolerancia de `IN` a una tensión mayor no se extiende a estos pines. Véase [alimentación y USB](alimentacion-usb.md).
+
 La habilitación del TPS63070 debe obedecer por hardware a `(OFF y VBUS válido) o (ON y batería válida)`. Así OFF+USB admite programación sin batería, mientras ON+USB sin batería no arranca. El esquema debe definir la detección de batería válida y secuenciar la apertura de contactos corporales antes de pasar de alimentación por batería a USB al mover ON→OFF. [Hoja de datos BQ24074 de TI](https://www.ti.com/lit/ds/symlink/bq24074.pdf), tabla 7-2 y apartado 9.3.2.
 
 | Interruptor | USB | Modo BQ24074 | Fuente de 3V3 | Carga | USB datos/programación | Conexiones corporales |
@@ -68,7 +70,7 @@ I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GP
 ## 5. Verificación obligatoria
 
 1. Fotografiar y medir cada breakout: pinout, reguladores, *pull-ups*, consumo y dimensiones.
-2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir las transiciones de interruptor y USB, y comprobar que los contactos corporales se abren antes de que USB pueda alimentar el sistema.
+2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir con osciloscopio `EN1`, `EN2` y `CE` durante los estados y transiciones, y comprobar sus límites de tensión y que los contactos corporales se abren antes de que USB pueda alimentar el sistema.
 3. Medir 3V3 en ESP y MAX30205, rizado, picos BLE/PPG y carga del BQ24074.
 4. Confirmar apertura de cada conductor corporal, masa incluida, con firmware fallado o GPIO atascado.
 5. Demostrar limitación GSR ante corto y ausencia de bypass de los 100 kΩ.

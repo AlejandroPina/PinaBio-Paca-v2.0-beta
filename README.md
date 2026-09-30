@@ -20,4 +20,4 @@ La placa registra ECG, PPG, GSR, dos bandas respiratorias, temperatura local y b
 - [Protocol (EN)](docs/en/protocol.md)
 - [V1 comparison (EN)](docs/en/v1-comparison.md)
 
-Antes de fabricación son obligatorios: verificación de cada breakout, esquemático y PCB KiCad, revisión independiente de las rutas hacia el cuerpo y los ensayos eléctricos y de aislamiento descritos en la especificación.
+Antes de fabricación son obligatorios: verificación de cada breakout, esquemático y PCB KiCad, comprobación de las rutas hacia el cuerpo y los ensayos eléctricos descritos en la especificación. Los conectores de sensores no llevan cortes automáticos; para USB durante la adquisición con una persona se exige un aislador externo.

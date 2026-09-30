@@ -20,4 +20,4 @@ The board is designed to acquire ECG, PPG, GSR, two respiration bands, local tem
 - [Comparación V1/V2 (ES)](docs/es/comparacion-v1.md)
 - [Registro de revisión (ES)](docs/es/revision-diseno.md)
 
-Before manufacture, the actual breakouts, KiCad schematic and PCB, body-contact paths, and the specified electrical and isolation tests must be independently verified.
+Before manufacture, the actual breakouts, KiCad schematic and PCB, body-connected paths and specified electrical tests must be verified. Sensor connectors have no automatic disconnect; USB during acquisition with a person requires an external isolator.

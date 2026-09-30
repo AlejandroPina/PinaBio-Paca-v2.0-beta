@@ -1,14 +1,14 @@
-# PinaBio Paca — contrato de firmware, BLE y datos `PROTO-0.4`
+# PinaBio Paca — contrato de firmware, BLE y datos `PROTO-0.5`
 
 [Portada](../../README.md) · [Especificación](especificacion.md)
 
 Propuesta de protocolo, no firmware implementado. Campos multibyte en *little-endian*. El protocolo conserva datos crudos, calibración y pérdidas; no diagnostica ni calcula HRV en la placa.
 
-## Estados y armado
+## Estados e inicio de adquisición
 
 Estados: `BOOT`, `IDLE_USB`, `IDLE_BATTERY`, `ACQUIRING`, `LOW_BATTERY`, `SENSOR_FAULT` e `INTERNAL_FAULT`. `LEADS_OFF` es una bandera de ECG. VBUS no es por sí mismo un bloqueo: con ON, batería presente y aislador USB externo puede existir `ACQUIRING`. El firmware no puede detectar de forma fiable el aislador y debe informar `usb_present` y `isolation_unverified` en STATUS; la aplicación muestra una advertencia inequívoca y el usuario confirma el procedimiento seguro antes de START.
 
-El armado exige ON físico, alimentación válida, realimentación de contactos abiertos al inicio, autocomprobación de buses/ADC y posterior cierre confirmado. Si falla un contacto, se abre o no confirma, el estado pasa a `INTERNAL_FAULT`; ningún comando puede forzar la barrera. OFF corta alimentación. Wi‑Fi queda desactivado desde el arranque.
+START exige ON físico, alimentación válida y autocomprobación de buses/ADC. No hay relés de corte ni realimentación de contactos de sensores. OFF quita la alimentación desde batería, pero OFF+USB sigue encendiendo el sistema para carga y mantenimiento; los sensores deben estar retirados de la persona en ese estado. Wi‑Fi queda desactivado desde el arranque.
 
 ## Muestreo
 
@@ -23,10 +23,10 @@ Servicio provisional `b88b0000-1a8c-4a2b-ae02-50494e414249`; características `0
 
 La trama mantiene cabecera de 22 bytes y CRC16/CCITT-FALSE final: `magic u16=0x5042`, `major u8=1`, `type u8` (ECG/PPG/SLOW/STATUS), `seq u16`, `flags u16`, `t0_us u64`, `period_ns u32`, `count u16`, payload y CRC16. ECG es s24 LE; PPG son RED u24 + IR u24; SLOW contiene `channel u8`, `quality u8`, `dt_us u16`, `value_s32` y `raw_s32`. Los canales SLOW son GSR, THORAX, ABDOMEN, TEMP y BATTERY.
 
-`STATUS` incluye estado, motivo, `physical_vbus`, `isolation_unverified`, `body_contact_fb`, `adc_overrun`, `ble_drop` y `ppg_overflow`. Los motivos de START incluyen `LOW_BATTERY`, `CONTACT_OPEN`, `SENSOR_FAULT`, `INTERNAL_FAULT` y `MTU_TOO_SMALL`; no existe `VBUS_LOCKOUT`.
+`STATUS` incluye estado, motivo, `physical_vbus`, `isolation_unverified`, `adc_overrun`, `ble_drop` y `ppg_overflow`. Los motivos de START incluyen `LOW_BATTERY`, `SENSOR_FAULT`, `INTERNAL_FAULT` y `MTU_TOO_SMALL`; no existen `CONTACT_OPEN` ni `VBUS_LOCKOUT`. `LEADS_OFF` sigue siendo una bandera del AD8232, no un estado de relé.
 
 ## Control, pérdida y pruebas
 
 `START` recibe máscara de canales y devuelve sesión y tasas concedidas; `STOP`, `GET_STATUS` y `SET_PPG` conservan su semántica. No se habilitan AUX ni IDAC. Si los anillos se llenan se descartan muestras antiguas completas y la siguiente trama lleva `GAP_BEFORE`; nunca se repiten o inventan muestras.
 
-Se deben probar diez minutos de ECG/PPG, pérdidas BLE y MTU insuficiente, contactos fallados, batería baja, saturación, FIFO PPG, CRC y los cuatro estados USB/interruptor. La prueba de adquisición con USB exige aislador externo medido: no puede aprobarse solo con una bandera de software.
+Se deben probar diez minutos de ECG/PPG, pérdidas BLE y MTU insuficiente, batería baja, saturación, FIFO PPG, CRC y los cuatro estados USB/interruptor. La prueba de adquisición con USB exige aislador externo medido: no puede aprobarse solo con una bandera de software.

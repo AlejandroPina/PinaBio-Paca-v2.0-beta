@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.7`
+# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.8`
 
 [Portada](../../README.md) · [Alimentación y USB](alimentacion-usb.md) · [Protocolo](protocolo.md)
 
@@ -27,7 +27,7 @@ El TPS63070, en PWM forzado, genera el raíl de 3,30 V nominales (consigna 3,295
 | `BAT_PROT` | LiPo 1S protegida → BAT del BQ24074 | 3,0–4,2 V; batería con protección y NTC. |
 | `VBUS_RAW` | USB-C tras ESD/fusible | Nunca a GPIO; detección solo telemétrica. |
 | `SYS` | Salida del BQ24074 → TPS63070 | El BQ24074 aporta *power-path*, no 3,3 V regulados. |
-| `3V3_SYS` | TPS63070. FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, ambas al 0,1 %. PS/SYNC a masa. | 3,295 V nominales. ESP32, ADC, PPG, lógica y la entrada del LDO. Diseñar ≥500 mA y medir picos BLE, PPG y contactos. |
+| `3V3_SYS` | TPS63070. FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, ambas al 0,1 %. PS/SYNC a masa. | 3,295 V nominales. ESP32, ADC, PPG, lógica y la entrada del LDO. Diseñar ≥500 mA y medir picos BLE y PPG. |
 | `3V3_A` | Desde 3V3_SYS mediante 0 Ω/ferrita opcional | ADS analógico, MCP6004 y AD8232. |
 | `3V0_TEMP` | TLV75530PDBVR desde 3V3_SYS. 2,2 µF X7R en entrada y en salida, para conservar al menos 0,47 µF efectivos. EN unido a su entrada. | Solo el VCC del CJMCU-30205. |
 | `0V5_EXC` | MCP6004 desde 56 kΩ/10 kΩ de 3V3_A | ≈0,50 V; calibrar por placa. |
@@ -38,22 +38,22 @@ Con OFF y VBUS válido: `EN1=alto`, `EN2=bajo`, `CE=bajo` permiten carga y salid
 
 La lógica derivada de VBUS debe respetar en cada pin `EN1`, `EN2` y `CE`: bajo **0–0,4 V**, alto **1,4–6 V**, máximo absoluto **−0,3 a 7 V**, incluso durante transitorios. El esquema debe incluir la limitación/protección necesaria y margen respecto a 6 V en operación; los 7 V no son una consigna. La tolerancia de `IN` a una tensión mayor no se extiende a estos pines. Véase [alimentación y USB](alimentacion-usb.md).
 
-La habilitación del TPS63070 debe obedecer por hardware a `(OFF y VBUS válido) o (ON y batería válida)`. Así OFF+USB admite programación sin batería, mientras ON+USB sin batería no arranca. El esquema debe definir la detección de batería válida y secuenciar la apertura de contactos corporales antes de pasar de alimentación por batería a USB al mover ON→OFF. [Hoja de datos BQ24074 de TI](https://www.ti.com/lit/ds/symlink/bq24074.pdf), tabla 7-2 y apartado 9.3.2.
+La habilitación del TPS63070 debe obedecer por hardware a `(OFF y VBUS válido) o (ON y batería válida)`. Así OFF+USB admite programación sin batería, mientras ON+USB sin batería no arranca. El esquema debe definir la detección de batería válida y comprobar las transiciones de fuente al mover ON→OFF. [Hoja de datos BQ24074 de TI](https://www.ti.com/lit/ds/symlink/bq24074.pdf), tabla 7-2 y apartado 9.3.2.
 
-| Interruptor | USB | Modo BQ24074 | Fuente de 3V3 | Carga | USB datos/programación | Conexiones corporales |
+| Interruptor | USB | Modo BQ24074 | Fuente de 3V3 | Carga | USB datos/programación | Uso con persona |
 |---|---:|---|---|---|---|---|
-| OFF | no | entrada inválida | ninguna | no | no | abiertas |
-| OFF | sí | USB500, si fuente válida | VBUS vía BQ24074 | sí | sí | abiertas |
-| ON | no | entrada inválida | LiPo | no | no | armables |
-| ON | sí | standby, `EN1=EN2=alto` | LiPo | no | sí | armables solo con aislador USB externo |
+| OFF | no | entrada inválida | ninguna | no | no | no hay adquisición |
+| OFF | sí | USB500, si fuente válida | VBUS vía BQ24074 | sí | sí | no conectar a una persona |
+| ON | no | entrada inválida | LiPo | no | no | adquisición con batería |
+| ON | sí | standby, `EN1=EN2=alto` | LiPo | no | sí | solo con aislador USB externo |
 
 Con OFF y USB, el ESP puede arrancar para programarse; al retirar USB queda apagado. Con ON y USB, D+/D− continúan funcionando y `OUT` se alimenta de la batería, aunque VBUS permanece en `IN` del cargador. Para medir con USB conectado se requiere un aislador externo alimentado desde el ordenador; la masa del conector de placa no se corta, pues el retorno de datos forma parte de ese aislamiento externo. Un cable USB normal no debe usarse sobre una persona.
 
-## 3. Barrera corporal
+## 3. Conectores hacia sensores y regla de uso
 
-Cada conductor de `J_ECG`, `J_PPG`, `J_TEMP`, `J_RESP_T` y `J_RESP_A`, incluida masa y alimentación, cruza contactos normalmente abiertos. `BODY_ALLOW` requiere ON, alimentación válida, autocomprobación y confirmación de los contactos. Pérdida de alimentación abre la barrera. El firmware solo puede solicitar armado: no debe poder cerrar contactos si el realimentado físico no coincide ni sustituir la lógica de seguridad.
+Los conectores `J_ECG`, `J_PPG`, `J_TEMP`, `J_GSR`, `J_RESP_T` y `J_RESP_A` van a sus circuitos sin relés, conmutadores ni contactos de corte. OFF deshabilita el sistema salvo cuando USB lo alimenta para carga y mantenimiento. Por tanto, OFF **no** separa eléctricamente los módulos ni los electrodos del USB; durante la carga o programación con USB directo se desconecta a la persona y sus sensores.
 
-No se admiten rutas alternativas por blindajes, ESD, *pull-ups*, diodos de GPIO, fijaciones o puntos de prueba. El diseño no afirma aislamiento galvánico interno ni seguridad clínica. Con USB durante una medición, la seguridad depende del aislador externo y del procedimiento de uso, no de detectar VBUS.
+La placa no incluye aislamiento galvánico interno ni detecta si hay aislador externo. Con USB durante una medición, el aislamiento depende del dispositivo externo y del procedimiento de uso. `usb_present` es información de estado, no una prueba de aislamiento.
 
 ## 4. Módulos y adquisición
 
@@ -72,11 +72,11 @@ I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GP
 ## 5. Verificación obligatoria
 
 1. Fotografiar y medir cada breakout: pinout, reguladores, *pull-ups*, consumo y dimensiones.
-2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir con osciloscopio `EN1`, `EN2` y `CE` durante los estados y transiciones, y comprobar sus límites de tensión y que los contactos corporales se abren antes de que USB pueda alimentar el sistema.
+2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir con osciloscopio `EN1`, `EN2` y `CE` durante los estados y transiciones, y comprobar sus límites de tensión.
 3. Medir 3V3 en el ESP y 3V0 en el VCC del CJMCU-30205, rizado, picos BLE/PPG y carga del BQ24074. En el módulo de pulso, con el LED encendido y el cable puesto, VIN no debe bajar de 3,1 V.
-4. Confirmar apertura de cada conductor corporal, masa incluida, con firmware fallado o GPIO atascado.
+4. Verificar que ningún conector de sensor queda alimentado por error con el sistema realmente apagado y sin USB; con OFF+USB, documentar expresamente que puede haber tensión en los conectores.
 5. Demostrar limitación GSR ante corto y ausencia de bypass de los 100 kΩ.
 6. Medir excursión AD8232, saturación ADS, ruido 50/60 Hz, respuesta de bandas y buses con cables reales.
 7. Validar aislamiento externo y datos USB durante adquisición antes de permitir ese modo de uso.
 
-Antes de fabricar se requieren esquemático KiCad, ERC/DRC limpios, BOM/huellas verificadas y revisión independiente de las rutas al cuerpo.
+Antes de fabricar se requieren esquemático KiCad, ERC/DRC limpios, BOM/huellas verificadas y revisión de las rutas al cuerpo y del uso previsto del aislador externo.

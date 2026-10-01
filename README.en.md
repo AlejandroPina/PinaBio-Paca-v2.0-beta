@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/pina-logo.jpg" alt="PINA — Protocols and Innovation in Applied Neuroscience logo" width="640"></p>
 
-# PinaBio Paca v2.0 beta — design documentation
+# PinaBio Paca v2.0 beta — documentation and KiCad prototype
 
 [Español](README.md)
 
@@ -10,6 +10,7 @@ The board is designed to acquire ECG, PPG, GSR, two respiration bands, local tem
 
 ## Documentation
 
+- [KiCad 9 project "PinaBio-v2.0-ChatGPT"](hardware/PinaBio-v2.0-ChatGPT/README.en.md) — schematic, routed PCB, BOM and ERC/DRC reports; **prototype awaiting validation, with no manufacturing Gerbers released**.
 - [Hardware specification (EN)](docs/en/specification.md)
 - [Power and USB (EN)](docs/en/power-usb.md)
 - [Protocol (EN)](docs/en/protocol.md)
@@ -20,4 +21,4 @@ The board is designed to acquire ECG, PPG, GSR, two respiration bands, local tem
 - [Comparación V1/V2 (ES)](docs/es/comparacion-v1.md)
 - [Registro de revisión (ES)](docs/es/revision-diseno.md)
 
-Before manufacture, the actual breakouts, KiCad schematic and PCB, body-connected paths and specified electrical tests must be verified. Sensor connectors have no automatic disconnect; USB during acquisition with a person requires an external isolator.
+Before manufacture, the actual breakouts, schematic, footprints, PCB, body-connected paths and specified electrical tests must be independently verified. Sensor connectors have no automatic disconnect; USB during acquisition with a person requires an external isolator.

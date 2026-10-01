@@ -1,0 +1,1 @@
+ESP32-S3-MINI-1U footprint and 3D model copied from [Espressif KiCad libraries](https://github.com/espressif/kicad-libraries), CC-BY-SA 4.0 with the electronics-design waiver stated in the source LICENSE.md. The 3D model path in the footprint was made project-relative. Flattened KiCad stock symbols follow the [KiCad library license](https://www.kicad.org/libraries/license/).

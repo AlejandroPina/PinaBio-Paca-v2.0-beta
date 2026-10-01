@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 
-# PinaBio Paca v2.0 beta — revisión documental
+# PinaBio Paca v2.0 beta — documentación y prototipo KiCad
 
 [English](README.en.md)
 
@@ -10,6 +10,7 @@ La placa registra ECG, PPG, GSR, dos bandas respiratorias, temperatura local y b
 
 ## Documentación
 
+- [Proyecto KiCad 9 «PinaBio-v2.0-ChatGPT»](hardware/PinaBio-v2.0-ChatGPT/README.md) — esquemático, PCB enrutada, BOM e informes ERC/DRC; **prototipo pendiente de validación, sin Gerbers liberados para fabricación**.
 - [Especificación de hardware (ES)](docs/es/especificacion.md)
 - [Alimentación y USB (ES)](docs/es/alimentacion-usb.md)
 - [Protocolo BLE y datos (ES)](docs/es/protocolo.md)
@@ -20,4 +21,4 @@ La placa registra ECG, PPG, GSR, dos bandas respiratorias, temperatura local y b
 - [Protocol (EN)](docs/en/protocol.md)
 - [V1 comparison (EN)](docs/en/v1-comparison.md)
 
-Antes de fabricación son obligatorios: verificación de cada breakout, esquemático y PCB KiCad, comprobación de las rutas hacia el cuerpo y los ensayos eléctricos descritos en la especificación. Los conectores de sensores no llevan cortes automáticos; para USB durante la adquisición con una persona se exige un aislador externo.
+Antes de fabricación son obligatorios: revisión independiente de huellas y esquema, verificación de cada breakout, comprobación de las rutas hacia el cuerpo y los ensayos eléctricos descritos en la especificación. Los conectores de sensores no llevan cortes automáticos; para USB durante la adquisición con una persona se exige un aislador externo.

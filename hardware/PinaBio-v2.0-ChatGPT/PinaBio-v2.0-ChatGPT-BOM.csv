@@ -1,0 +1,94 @@
+﻿Reference,Value,Footprint,Notes
+J1,USB-C USB2.0 16P,Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12,USB 2.0 sink
+R1,5.1k 1%,Resistor_SMD:R_0603_1608Metric,
+R2,5.1k 1%,Resistor_SMD:R_0603_1608Metric,
+R3,100k 1%,Resistor_SMD:R_0603_1608Metric,
+R4,150k 1%,Resistor_SMD:R_0603_1608Metric,
+D1,BZT52C3V3,Diode_SMD:D_SOD-123,VBUS mode node clamp
+D2,SMF5.0A,Diode_SMD:D_SOD-123F,USB VBUS transient clamp
+U1,USBLC6-2SC6,Package_TO_SOT_SMD:SOT-23-6,
+R5,22R,Resistor_SMD:R_0603_1608Metric,
+R6,22R,Resistor_SMD:R_0603_1608Metric,
+J2,LiPo 1S protected + NTC,Connector_JST:JST_PH_S3B-PH-K_1x03_P2.00mm_Horizontal,Battery pack must include cell protection and 10k NTC
+SW1,ON/OFF DPDT,Button_Switch_SMD:SW_DPDT_CK_JS202011JCQN,
+U2,BQ24074RGT,Package_DFN_QFN:VQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm,USB500 charge in OFF; USB suspend/battery in ON
+R7,3.00k 1%,Resistor_SMD:R_0603_1608Metric,
+R8,3.00k 1%,Resistor_SMD:R_0603_1608Metric,
+R9,1.50k 1%,Resistor_SMD:R_0603_1608Metric,
+R10,46.4k 1%,Resistor_SMD:R_0603_1608Metric,
+C1,1uF 16V X7R,Capacitor_SMD:C_0603_1608Metric,
+C2,4.7uF 10V X7R,Capacitor_SMD:C_0603_1608Metric,
+C3,10uF 10V X7R,Capacitor_SMD:C_0603_1608Metric,
+R11,10k,Resistor_SMD:R_0603_1608Metric,
+R12,10k,Resistor_SMD:R_0603_1608Metric,
+U3,TPS63070RNM,PinaBio-ChatGPT:TPS63070_RNM0015A,49.9k/16k feedback; forced PWM
+L1,XAL4020-152MEC 1.5uH,Inductor_SMD:L_Coilcraft_XAL4020-XXX,"1.5uH, Isat 7.1A typical"
+R13,49.9k 0.1%,Resistor_SMD:R_0603_1608Metric,
+R14,16.0k 0.1%,Resistor_SMD:R_0603_1608Metric,
+R15,10k,Resistor_SMD:R_0603_1608Metric,
+C4,10uF 10V X7R,Capacitor_SMD:C_0603_1608Metric,
+C5,10uF 10V X7R,Capacitor_SMD:C_0603_1608Metric,
+C6,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+C7,22uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+C8,22uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+C9,22uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+R16,0R,Resistor_SMD:R_0603_1608Metric,Optional ferrite location; populate 0R initially
+U4,TLV75530PDBVR,Package_TO_SOT_SMD:SOT-23-5,Fixed 3.0V; temperature breakout only
+C10,2.2uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+C11,2.2uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+U5,ESP32-S3-MINI-1U-N8,PinaBio-ChatGPT:ESP32-S3-MINI-1U,"N8, external 2.4GHz 50-ohm antenna; Wi-Fi off"
+R17,10k,Resistor_SMD:R_0603_1608Metric,
+C12,1uF X7R,Capacitor_SMD:C_0603_1608Metric,
+R18,10k,Resistor_SMD:R_0603_1608Metric,
+R19,1M 1%,Resistor_SMD:R_0603_1608Metric,
+R20,330k 1%,Resistor_SMD:R_0603_1608Metric,
+C13,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+R21,100k,Resistor_SMD:R_0603_1608Metric,
+R22,100k,Resistor_SMD:R_0603_1608Metric,
+R23,100k,Resistor_SMD:R_0603_1608Metric,
+SW2,BOOT,Button_Switch_SMD:SW_SPST_TL3305A,
+SW3,RESET,Button_Switch_SMD:SW_SPST_TL3305A,
+C14,10uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+C15,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+C16,10uF 6.3V X7R,Capacitor_SMD:C_0805_2012Metric,
+U6,ADS122C04IPW,Package_SO:TSSOP-16_4.4x5mm_P0.65mm,I2C 0x40; continuous 600 SPS; gain1 PGA bypass
+U7,ADS122C04IPW,Package_SO:TSSOP-16_4.4x5mm_P0.65mm,I2C 0x41; three single-ended channels
+R24,2.2k,Resistor_SMD:R_0603_1608Metric,
+R25,2.2k,Resistor_SMD:R_0603_1608Metric,
+R26,10k,Resistor_SMD:R_0603_1608Metric,
+R27,10k,Resistor_SMD:R_0603_1608Metric,
+C17,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+C18,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+C19,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+C20,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+J3,AD8232 external module,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,"3V3,GND,OUTPUT,LO+,LO-,SDN; module contains electrode jack"
+R28,33.2k 1%,Resistor_SMD:R_0603_1608Metric,
+R29,47.5k 1%,Resistor_SMD:R_0603_1608Metric,
+C21,33nF X7R,Capacitor_SMD:C_0603_1608Metric,Analog low-pass; verify ECG bandwidth in lab
+U8,MCP6004,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,
+R30,56k 1%,Resistor_SMD:R_0603_1608Metric,
+R31,10k 1%,Resistor_SMD:R_0603_1608Metric,
+C22,1uF X7R,Capacitor_SMD:C_0603_1608Metric,
+C23,100nF X7R,Capacitor_SMD:C_0603_1608Metric,
+J4,GSR,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Two-wire body sensor; no automatic cutoff
+R32,100k 1%,Resistor_SMD:R_0603_1608Metric,Physical current limiter in body path
+R35,100k 1%,Resistor_SMD:R_0603_1608Metric,Opamp input ESD current limiter
+R38,10k 1%,Resistor_SMD:R_0603_1608Metric,
+C24,1uF X7R,Capacitor_SMD:C_0603_1608Metric,
+J5,RESP_T,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Two-wire body sensor; no automatic cutoff
+R33,100k 1%,Resistor_SMD:R_0603_1608Metric,Physical current limiter in body path
+R36,100k 1%,Resistor_SMD:R_0603_1608Metric,Opamp input ESD current limiter
+R39,10k 1%,Resistor_SMD:R_0603_1608Metric,
+C25,1uF X7R,Capacitor_SMD:C_0603_1608Metric,
+J6,RESP_A,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Two-wire body sensor; no automatic cutoff
+R34,100k 1%,Resistor_SMD:R_0603_1608Metric,Physical current limiter in body path
+R37,100k 1%,Resistor_SMD:R_0603_1608Metric,Opamp input ESD current limiter
+R40,10k 1%,Resistor_SMD:R_0603_1608Metric,
+C26,1uF X7R,Capacitor_SMD:C_0603_1608Metric,
+J7,GY-30102 external,Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical,"VIN,GND,SCL,SDA,INT; breakout voltage/pullups to be measured"
+J8,CJMCU-30205 external,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,"VCC,GND,SDA,SCL,OS,A0,A1,A2; confirm breakout pin order"
+R41,4.7k,Resistor_SMD:R_0603_1608Metric,
+R42,4.7k,Resistor_SMD:R_0603_1608Metric,
+R43,10k,Resistor_SMD:R_0603_1608Metric,
+R44,10k,Resistor_SMD:R_0603_1608Metric,
+J9,DEBUG UART,Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical,"Engineering-only 3.3V UART, no power input"

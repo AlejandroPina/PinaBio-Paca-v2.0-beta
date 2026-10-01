@@ -1,0 +1,1 @@
+(fp_lib_table (lib (name "PinaBio-ChatGPT")(type "KiCad")(uri "${KIPRJMOD}/PinaBio-ChatGPT.pretty")(options "")(descr "PinaBio custom footprints")))

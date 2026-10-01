@@ -1,0 +1,12 @@
+*.dsn
+*.ses
+*.net
+*.xml
+*.kicad_prl
+*-routed.kicad_pcb
+*-routed.kicad_pro
+ERC-host.txt
+DRC-placement.txt
+DRC-routed.txt
+preview/*.svg
+preview/*.png

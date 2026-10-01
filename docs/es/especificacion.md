@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.8`
+# PinaBio Paca v2.0 beta — especificación de hardware `SPEC-0.9`
 
 [Portada](../../README.md) · [Alimentación y USB](alimentacion-usb.md) · [Protocolo](protocolo.md)
 
@@ -29,12 +29,12 @@ El TPS63070, en PWM forzado, genera el raíl de 3,30 V nominales (consigna 3,295
 | `SYS` | Salida del BQ24074 → TPS63070 | El BQ24074 aporta *power-path*, no 3,3 V regulados. |
 | `3V3_SYS` | TPS63070. FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, ambas al 0,1 %. PS/SYNC a masa. | 3,295 V nominales. ESP32, ADC, PPG, lógica y la entrada del LDO. Diseñar ≥500 mA y medir picos BLE y PPG. |
 | `3V3_A` | Desde 3V3_SYS mediante 0 Ω/ferrita opcional | ADS analógico, MCP6004 y AD8232. |
-| `3V0_TEMP` | TLV75530PDBVR desde 3V3_SYS. 2,2 µF X7R en entrada y en salida, para conservar al menos 0,47 µF efectivos. EN unido a su entrada. | Solo el VCC del CJMCU-30205. |
+| `3V0_TEMP` | TLV75530PDBVR desde 3V3_SYS. 2,2 µF X7R 0805 en entrada y en salida, para conservar al menos 0,47 µF efectivos. EN unido a su entrada. | Solo el VCC del CJMCU-30205. |
 | `0V5_EXC` | MCP6004 desde 56 kΩ/10 kΩ de 3V3_A | ≈0,50 V; calibrar por placa. |
 
-USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa, D+/D− tienen ESD de baja capacidad y van a GPIO19/GPIO20. El conector nunca recibe VBUS desde la placa. VBUS protegido llega a `IN` del BQ24074 con OFF y con ON; no hay MOSFET externo de corte. El interruptor físico fija los pines de modo del cargador y la habilitación del regulador sin depender del ESP32.
+USB-C es un sumidero USB 2.0: `CC1`/`CC2` llevan `Rd=5,1 kΩ` a masa. D+ y D− pasan por un USBLC6-2SC6 en SOT-23-6 (el mismo patillaje que el USBLC6-2P6: el conector a un lado, el ESP32 al otro, GND y VBUS como en ese símbolo) y, entre el protector y el módulo, por 22 Ω en serie: D− a GPIO19 y D+ a GPIO20. El conector nunca recibe VBUS desde la placa. VBUS protegido llega a `IN` del BQ24074 con OFF y con ON; no hay MOSFET externo de corte. El interruptor físico fija los pines de modo del cargador y la habilitación del regulador sin depender del ESP32.
 
-Con OFF y VBUS válido: `EN1=alto`, `EN2=bajo`, `CE=bajo` permiten carga y salida desde USB, con límite USB500 solo si la fuente lo admite. Con ON y VBUS válido: `EN1=EN2=alto` ponen el BQ24074 en *standby/USB suspend*: `Q1` interno (IN→OUT) abierto, `Q2` (BAT→OUT) cerrado y carga detenida. `CE=alto` añade inhibición de carga, pero no basta por sí solo para evitar que USB alimente `OUT`. Los niveles de `EN1`, `EN2` y `CE` deben provenir del interruptor y VBUS, seguir definidos sin batería y no depender de firmware. `ILIM`, `ISET` e `ITERM` se calculan para la fuente, LiPo y carga prevista de ≈300 mA; `TS` va al NTC.
+Con OFF y VBUS válido: `EN1=alto`, `EN2=bajo`, `CE=bajo` permiten carga y salida desde USB, con límite USB500 solo si la fuente lo admite. Con ON y VBUS válido: `EN1=EN2=alto` ponen el BQ24074 en *standby/USB suspend*: `Q1` interno (IN→OUT) abierto, `Q2` (BAT→OUT) cerrado y carga detenida. `CE=alto` añade inhibición de carga, pero no basta por sí solo para evitar que USB alimente `OUT`. Los niveles de `EN1`, `EN2` y `CE` deben provenir del interruptor y VBUS, seguir definidos sin batería y no depender de firmware. `ILIM`, `ISET` e `ITERM` se calculan para la fuente, la LiPo y la carga prevista de ≈300 mA. `TMR` lleva 46,4 kΩ al 1 % a masa. `TS` va al NTC.
 
 La lógica derivada de VBUS debe respetar en cada pin `EN1`, `EN2` y `CE`: bajo **0–0,4 V**, alto **1,4–6 V**, máximo absoluto **−0,3 a 7 V**, incluso durante transitorios. El esquema debe incluir la limitación/protección necesaria y margen respecto a 6 V en operación; los 7 V no son una consigna. La tolerancia de `IN` a una tensión mayor no se extiende a estos pines. Véase [alimentación y USB](alimentacion-usb.md).
 
@@ -67,9 +67,17 @@ La placa no incluye aislamiento galvánico interno ni detecta si hay aislador ex
 
 Los IDAC de los ADS permanecen apagados y no se conectan a rutas corporales. GSR y bandas se muestrean inicialmente a 20 SPS por canal; se publican estados OPEN, SHORT, OUT_OF_RANGE y UNCALIBRATED. Las bandas producen resistencia y curva respiratoria, no volumen pulmonar.
 
-I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GPIO6/7. I²C de módulos (GPIO8/9) empieza a 100 kHz; INT PPG usa GPIO10. `BAT_SENSE` (GPIO1) usa divisor 1 MΩ/330 kΩ conmutado, filtro y calibración. GPIO0 queda reservado para BOOT; D−/D+ son GPIO19/20.
+I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GPIO6/7. I²C de módulos (GPIO8/9) empieza a 100 kHz; INT PPG usa GPIO10. `BAT_SENSE` (GPIO1) usa divisor 1 MΩ/330 kΩ conmutado, filtro y calibración. GPIO0 queda reservado para BOOT, con 10 kΩ a `3V3_SYS`; el pulsador de BOOT lo lleva a masa. D−/D+ son GPIO19/20, cada una con sus 22 Ω en serie.
 
-## 5. Verificación obligatoria
+## 5. Placa
+
+Cuatro capas, unos 81 × 57 mm. El ESP32-S3-MINI-1U no lleva antena de circuito impreso: lleva conector U.FL. Ese extremo del módulo queda en el borde de la placa, lo más salido posible, para que la antena externa quede fuera del cobre. En todas las capas, bajo ese extremo y un poco más allá del borde del módulo hacia fuera, no hay cobre, pistas, vías ni plano. El USB y el buck no se colocan bajo esa zona.
+
+Hay dos planos de masa. La masa digital reúne el ESP32, el USB, el BQ24074 y el TPS63070. La masa analógica reúne los ADS122C04, el MCP6004, el divisor de ECG, el GSR y las bandas. Se unen en un solo sitio, corto y ancho, junto a los ADS y al puente de 0 Ω entre `3V3_SYS` y `3V3_A`, de modo que alimentación y retorno coinciden en el mismo punto. No hay varias uniones repartidas ni una pista fina cruzando la placa. Las señales analógicas no cruzan la masa digital. In1 es masa, partida en esas dos zonas. F.Cu lleva el mismo reparto, cosido con vías a su zona. In2 es `3V3_SYS` y no lleva señales de datos. B.Cu lleva las señales.
+
+Los dos nodos del inductor del TPS63070 quedan en F.Cu, sin vía, a 0,40 mm en todo el tramo.
+
+## 6. Verificación obligatoria
 
 1. Fotografiar y medir cada breakout: pinout, reguladores, *pull-ups*, consumo y dimensiones.
 2. Ensayar los cuatro estados USB/interruptor, incluso sin batería: con ON y USB, `OUT` sigue a BAT y la corriente de carga es nula; sin batería, D+/D− y VBUS no pueden elevar 3V3. Medir con osciloscopio `EN1`, `EN2` y `CE` durante los estados y transiciones, y comprobar sus límites de tensión.

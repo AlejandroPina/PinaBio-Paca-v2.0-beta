@@ -11,6 +11,7 @@ The board is designed to acquire ECG, PPG, GSR, two respiration bands, local tem
 ## Documentation
 
 - [KiCad 9 project "PinaBio-v2.0-ChatGPT"](hardware/PinaBio-v2.0-ChatGPT/README.en.md) — schematic, routed PCB, BOM and ERC/DRC reports; **prototype awaiting validation, with no manufacturing Gerbers released**.
+- [KiCad 9 project "PinaBio-v2.0-Cursor"](hardware/cursor/PinaBio-v2.0-Cursor/README.md) — the same board to `SPEC-0.9` / `PWR-0.7`, with the U.FL antenna at the edge and the split ground.
 - [Hardware specification (EN)](docs/en/specification.md)
 - [Power and USB (EN)](docs/en/power-usb.md)
 - [Protocol (EN)](docs/en/protocol.md)

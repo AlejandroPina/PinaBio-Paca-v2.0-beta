@@ -1,4 +1,4 @@
-# Power and USB — revision `PWR-0.6`
+# Power and USB — revision `PWR-0.7`
 
 [Home](../../README.en.md) · [Hardware specification](specification.md)
 
@@ -23,10 +23,10 @@ Without USB, IN is invalid and OUT follows the battery. ON enables TPS63070; OFF
 - EN1 must be high when VBUS is valid. EN2 and CE must be high with ON and VBUS, low with OFF and VBUS. The physical switch and bias network must establish these levels without the ESP32 or battery; no control input may float. Verify levels and sequencing when USB is inserted and the switch moves.
 - For EN1, EN2 and CE, TI specifies a **1.4–6 V** high level, a **0–0.4 V** low level and an **−0.3 to 7 V** absolute-maximum range. The 7 V limit is not a design target. The network deriving these signals from VBUS must limit their voltage during normal operation, insertion and foreseeable overvoltage, with margin below 6 V; do not connect raw VBUS directly without demonstrating compliance. The IN pin has a different, higher absolute maximum that does not protect the logic pins.
 - With ON, USB and no battery, standby must prevent OUT from powering the board from USB. The regulator must not start without a valid battery. With OFF, USB and no battery, programming may start.
-- Select ILIM, ISET, ITERM, TMR and TS for the actual USB source, cell and NTC. BQ24074 has no SYSOFF pin and does not replace cell protection.
+- Select ILIM, ISET, ITERM and TS for the actual USB source, cell and NTC. TMR is 46.4 kΩ, 1 %, to ground. BQ24074 has no SYSOFF pin and does not replace cell protection.
 - No sensor-connector cutoff relays or switches are fitted. OFF+USB may power those connectors from VBUS, so direct-USB charging and programming require all sensors to be removed from the person. ON+USB with a person requires a host-powered external isolator.
-- TPS63070 runs in forced PWM. Feedback divider: 49.9 kΩ from VOUT to FB and 16.0 kΩ from FB to ground, both 0.1 %. Setpoint 3.295 V. PS/SYNC tied low. The TLV75530PDBVR, with 2.2 µF X7R at input and output, makes 3.0 V only for the CJMCU-30205 VCC. Those capacitors keep at least 0.47 µF of effective capacitance. Start the analogue-island feed with 0 Ω.
-- USB-C has ESD protection and separate 5.1 kΩ Rd resistors on CC1/CC2. D+/D− and VBUS detection must not back-power an off ESP32. The external isolator must create its board-side isolated VBUS from the host.
+- TPS63070 runs in forced PWM. Feedback divider: 49.9 kΩ from VOUT to FB and 16.0 kΩ from FB to ground, both 0.1 %. Setpoint 3.295 V. PS/SYNC tied low. Both inductor nodes stay on the top copper, with no via, at 0.40 mm for the whole run. The TLV75530PDBVR, with 2.2 µF X7R 0805 at input and output, makes 3.0 V only for the CJMCU-30205 VCC. Those capacitors keep at least 0.47 µF of effective capacitance. Start the analogue-island feed with 0 Ω. Analogue ground and digital ground meet at one short, wide point next to that link and the ADCs, so the supply and the return join together. There are no other joins.
+- USB-C uses a USBLC6-2SC6 in SOT-23-6 and separate 5.1 kΩ Rd resistors on CC1/CC2. Between the protector and the ESP32, D− (GPIO19) and D+ (GPIO20) each have 22 Ω in series. D+/D− and VBUS detection must not back-power an off ESP32. The external isolator must create its board-side isolated VBUS from the host. GPIO0 has a 10 kΩ pull-up to `3V3_SYS`; the BOOT button takes it to ground.
 
 ## Acceptance tests
 

@@ -11,6 +11,7 @@ La placa registra ECG, PPG, GSR, dos bandas respiratorias, temperatura local y b
 ## Documentación
 
 - [Proyecto KiCad 9 «PinaBio-v2.0-ChatGPT»](hardware/PinaBio-v2.0-ChatGPT/README.md) — esquemático, PCB enrutada, BOM e informes ERC/DRC; **prototipo pendiente de validación, sin Gerbers liberados para fabricación**.
+- [Proyecto KiCad 9 «PinaBio-v2.0-Cursor»](hardware/cursor/PinaBio-v2.0-Cursor/README.md) — la misma placa según `SPEC-0.9` / `PWR-0.7`, con la antena U.FL en el borde y la masa partida.
 - [Especificación de hardware (ES)](docs/es/especificacion.md)
 - [Alimentación y USB (ES)](docs/es/alimentacion-usb.md)
 - [Protocolo BLE y datos (ES)](docs/es/protocolo.md)

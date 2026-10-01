@@ -1,4 +1,4 @@
-# Alimentación y USB — revisión `PWR-0.6`
+# Alimentación y USB — revisión `PWR-0.7`
 
 [Portada](../../README.md) · [Especificación](especificacion.md)
 
@@ -25,11 +25,11 @@ Sin USB, `IN` no es válido y `OUT` recibe energía de la batería. ON habilita 
 - `EN1` debe estar alto cuando VBUS es válido. `EN2` y `CE` deben estar altos con **ON y VBUS**, y bajos con **OFF y VBUS**. El interruptor físico y la polarización de estas redes deben imponer los estados sin ESP32 ni batería; ningún pin de control puede quedar flotante. Los niveles y la secuencia se verifican también durante la inserción de USB y el cambio de posición.
 - Para `EN1`, `EN2` y `CE`, TI especifica nivel alto de **1,4–6 V**, nivel bajo de **0–0,4 V** y máximo absoluto de **−0,3 a 7 V**. Los 7 V son un límite de daño, no una consigna de diseño. La red que obtenga estas señales de VBUS debe limitar su tensión durante funcionamiento normal, inserción y sobretensiones previsibles, con margen respecto a 6 V; no se conectará VBUS directamente sin demostrar que esos límites se cumplen. El pin `IN` admite una tensión máxima absoluta distinta y mayor, que no protege los pines lógicos.
 - Con **ON, USB y batería ausente**, `EN1=EN2=alto` debe impedir que `OUT` encienda la placa desde USB. El regulador debe permanecer apagado si no hay batería válida. Con **OFF, USB y batería ausente**, el regulador puede arrancar para programación.
-- `ILIM`, `ISET`, `ITERM`, `TMR` y `TS` se dimensionan según hoja de datos, fuente USB, NTC y LiPo reales. El BQ24074 no tiene pin `SYSOFF` ni sustituye la protección de la celda.
+- `ILIM`, `ISET`, `ITERM` y `TS` se dimensionan según hoja de datos, fuente USB, NTC y LiPo reales. `TMR` lleva 46,4 kΩ al 1 % a masa. El BQ24074 no tiene pin `SYSOFF` ni sustituye la protección de la celda.
 - No se montan relés ni conmutadores de corte en los conectores de sensores. OFF+USB puede alimentar esos conectores desde VBUS; por eso la carga y programación con USB directo se hacen sin persona conectada. ON+USB con persona exige aislador externo alimentado desde el host.
-- TPS63070 en PWM forzado. Divisor de FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, al 0,1 %. Consigna 3,295 V. PS/SYNC a masa. El TLV75530PDBVR, con 2,2 µF X7R a la entrada y 2,2 µF X7R a la salida, hace 3,0 V solo para el VCC del CJMCU-30205. Esos condensadores dejan al menos 0,47 µF efectivos.
-- La isla analógica empieza con 0 Ω y se decide si lleva ferrita tras medir ruido.
-- USB-C usa ESD y dos resistencias `Rd` de 5,1 kΩ en CC1/CC2. D+/D− y la detección de VBUS no deben realimentar el ESP32 apagado. El aislador no está soldado a la placa y debe generar su VBUS aislado desde el host.
+- TPS63070 en PWM forzado. Divisor de FB: 49,9 kΩ de VOUT a FB y 16,0 kΩ de FB a masa, al 0,1 %. Consigna 3,295 V. PS/SYNC a masa. Los dos nodos del inductor van en la capa superior, sin vía, a 0,40 mm en todo el tramo. El TLV75530PDBVR, con 2,2 µF X7R 0805 a la entrada y 2,2 µF X7R 0805 a la salida, hace 3,0 V solo para el VCC del CJMCU-30205. Esos condensadores dejan al menos 0,47 µF efectivos.
+- La isla analógica empieza con 0 Ω y se decide si lleva ferrita tras medir ruido. La masa analógica y la masa digital se unen en un solo punto, corto y ancho, junto a ese puente y a los ADS, para que alimentación y retorno coincidan. No hay más uniones.
+- USB-C usa un USBLC6-2SC6 en SOT-23-6 y dos resistencias `Rd` de 5,1 kΩ en CC1/CC2. Entre el protector y el ESP32, D− (GPIO19) y D+ (GPIO20) llevan 22 Ω en serie. D+/D− y la detección de VBUS no deben realimentar el ESP32 apagado. El aislador no está soldado a la placa y debe generar su VBUS aislado desde el host. GPIO0 lleva 10 kΩ a `3V3_SYS`; el pulsador de BOOT lo pone a masa.
 
 ## Ensayos
 

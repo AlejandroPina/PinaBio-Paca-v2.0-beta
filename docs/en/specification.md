@@ -1,4 +1,4 @@
-# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.8`
+# PinaBio Paca v2.0 beta — hardware specification `SPEC-0.9`
 
 This is a design-review specification, not a validated schematic or manufacturing release. PinaBio is for experimental research and biofeedback, not medical use or diagnosis.
 
@@ -6,13 +6,13 @@ This is a design-review specification, not a validated schematic or manufacturin
 
 The ESP32-S3-MINI-1U-N8 acquires ECG, PPG, GSR, thoracic and abdominal respiration bands, local temperature and battery voltage, then sends raw data over BLE with Wi‑Fi disabled. One ADS122C04 is dedicated to ECG; the other serves GSR and both bands. MAX30102 and MAX30205 are external I²C modules.
 
-LiPo 1S protected → BQ24074 → TPS63070 → nominal 3.295 V `3V3_SYS` (49.9 kΩ / 16.0 kΩ, 0.1 %, forced PWM). An initially 0 Ω link may feed a `3V3_A` analogue island. A TLV75530PDBVR makes `3V0_TEMP` only for the CJMCU-30205, with 2.2 µF X7R at input and output. There is **no 2.9 V rail, TPS7A20 or TCA9801**.
+LiPo 1S protected → BQ24074 → TPS63070 → nominal 3.295 V `3V3_SYS` (49.9 kΩ / 16.0 kΩ, 0.1 %, forced PWM). An initially 0 Ω link may feed a `3V3_A` analogue island. A TLV75530PDBVR makes `3V0_TEMP` only for the CJMCU-30205, with 2.2 µF X7R 0805 at input and output. There is **no 2.9 V rail, TPS7A20 or TCA9801**.
 
 ## USB, switch and body connections
 
-USB-C is a USB 2.0 sink: CC1/CC2 have 5.1 kΩ Rd resistors; D+/D− have low-capacitance ESD and connect to GPIO19/20. Protected VBUS reaches BQ24074 IN in both switch positions. There is no external VBUS-cutoff MOSFET. The physical switch sets the charger mode pins and regulator enable independently of the ESP32.
+USB-C is a USB 2.0 sink: CC1/CC2 have 5.1 kΩ Rd resistors. D+ and D− pass through a USBLC6-2SC6 in SOT-23-6 (the same pinout as the USBLC6-2P6: connector on one side, ESP32 on the other, GND and VBUS as on that symbol) and then through 22 Ω in series: D− to GPIO19 and D+ to GPIO20. Protected VBUS reaches BQ24074 IN in both switch positions. There is no external VBUS-cutoff MOSFET. The physical switch sets the charger mode pins and regulator enable independently of the ESP32.
 
-With OFF and valid VBUS, `EN1=high`, `EN2=low` and `CE=low` allow charging and USB-powered OUT; USB500 is permitted only when the source supports that current. With ON and valid VBUS, `EN1=EN2=high` select standby/USB suspend: internal `Q1` (IN→OUT) is open, `Q2` (BAT→OUT) is closed and charging stops. `CE=high` adds charge inhibition but cannot alone prevent USB from powering OUT. EN1, EN2 and CE must be driven by the physical switch and VBUS, remain defined with no battery, and never rely on firmware. ILIM, ISET and ITERM are sized for the actual USB source, cell and initial ≈300 mA charge target; TS connects to the cell NTC.
+With OFF and valid VBUS, `EN1=high`, `EN2=low` and `CE=low` allow charging and USB-powered OUT; USB500 is permitted only when the source supports that current. With ON and valid VBUS, `EN1=EN2=high` select standby/USB suspend: internal `Q1` (IN→OUT) is open, `Q2` (BAT→OUT) is closed and charging stops. `CE=high` adds charge inhibition but cannot alone prevent USB from powering OUT. EN1, EN2 and CE must be driven by the physical switch and VBUS, remain defined with no battery, and never rely on firmware. ILIM, ISET and ITERM are sized for the actual USB source, cell and initial ≈300 mA charge target. TMR is 46.4 kΩ, 1 %, to ground. TS connects to the cell NTC. GPIO0 is reserved for BOOT, with a 10 kΩ pull-up to `3V3_SYS`; the BOOT button takes it to ground.
 
 The VBUS-derived logic must meet these limits at each EN1, EN2 and CE pin: low **0–0.4 V**, high **1.4–6 V**, absolute maximum **−0.3 to 7 V**, including transients. The schematic must provide the necessary voltage limiting/protection and operating margin below 6 V; 7 V is not a design target. The higher voltage tolerance at IN does not extend to these pins. See [power and USB](power-usb.md).
 
@@ -40,6 +40,14 @@ An external host-powered USB isolator is mandatory for use with a person while U
 | Temperature | CJMCU-30205 from `3V0_TEMP` only. Module VCC ties straight to the chip. A0, A1 and A2 to ground set address 0x48. |
 
 The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OPEN, SHORT, OUT_OF_RANGE and UNCALIBRATED rather than false values. Bands provide resistance and a derived respiratory curve, not lung volume. ADS IDACs remain disabled and never connect to body paths.
+
+## Board
+
+Four layers, about 81 × 57 mm. The ESP32-S3-MINI-1U has no printed antenna: it has a U.FL connector. That end of the module sits on the board edge, as far out as it will go, so the external antenna is outside the copper. On every layer, under that end and a little past the module edge outward, there is no copper, no track, no via and no plane. USB and the buck do not sit under that zone.
+
+There are two ground planes. Digital ground covers the ESP32, USB, the BQ24074 and the TPS63070. Analogue ground covers the ADS122C04 devices, the MCP6004, the ECG divider, GSR and the bands. They join in one place, short and wide, next to the ADCs and the 0 Ω link between `3V3_SYS` and `3V3_A`, so the supply and the return meet at the same point. There are no extra joins and no thin track crossing the board. Analogue signals do not cross digital ground. In1 is ground, split into those two zones. F.Cu carries the same split, stitched with vias to its own zone. In2 is `3V3_SYS` and carries no data signals. B.Cu carries the signals.
+
+Both TPS63070 inductor nodes stay on F.Cu, with no via, at 0.40 mm for the whole run.
 
 ## Mandatory verification
 

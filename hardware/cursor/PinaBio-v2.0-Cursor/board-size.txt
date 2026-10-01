@@ -1,0 +1,5 @@
+81.34 x 57.17 mm
+4 layers: F.Cu GND pour, In1.Cu GND, In2.Cu 3V3_SYS, B.Cu signals
+ERC 0 errors, 0 warnings (erc.rpt)
+DRC 0 errors, 0 warnings, 0 unconnected (drc.rpt)
+KiCad 9.0.9

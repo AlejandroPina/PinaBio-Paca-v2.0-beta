@@ -1,0 +1,46 @@
+Reference,Value,Footprint,Datasheet,Qty
+"J1","USB-C","Connector_USB:USB_C_Receptacle_HCTL_HC-TYPE-C-16P-01A","~",1
+"R1 R2","5.1k","Resistor_SMD:R_0603_1608Metric","~",2
+"U1","USBLC6-2SC6","Package_TO_SOT_SMD:SOT-23-6","https://www.st.com/resource/en/datasheet/usblc6-2.pdf",1
+"R3 R15","0","Resistor_SMD:R_0603_1608Metric","~",2
+"R4","10.0k","Resistor_SMD:R_0603_1608Metric","~",1
+"R5","15.0k","Resistor_SMD:R_0603_1608Metric","~",1
+"D1","BZX84-C3V6","Package_TO_SOT_SMD:SOT-23","https://assets.nexperia.com/documents/data-sheet/BZX84_SERIES.pdf",1
+"U2","BQ24074","Package_DFN_QFN:VQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm","https://www.ti.com/lit/ds/symlink/bq24074.pdf",1
+"R6 R7","2.94k 1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/bq24074.pdf",2
+"R8","2.2k","Resistor_SMD:R_0603_1608Metric","~",1
+"R9 R10 R11 R12 R19 R20 R21 R30 R31 R32","100k","Resistor_SMD:R_0603_1608Metric","~",10
+"C1","4.7uF","Capacitor_SMD:C_0603_1608Metric","~",1
+"C2 C3 C4 C5 C6 C10 C16","10uF","Capacitor_SMD:C_0805_2012Metric","~",7
+"SW1","SW_DPDT","Button_Switch_SMD:SW_DPDT_CK_JS202011JCQN","https://www.ckswitches.com/media/1428/js.pdf",1
+"U3","TPS63070","PinaCursor:TPS63070RNM","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"L1","1.5uH","Inductor_SMD:L_Coilcraft_XAL4020-XXX","https://www.coilcraft.com/en-us/products/power/shielded-inductors/xfl/xfl4020/",1
+"C7 C8 C9","22uF","Capacitor_SMD:C_0805_2012Metric","~",3
+"C11 C14 C17 C18 C19 C20 C21 C22","100nF","Capacitor_SMD:C_0603_1608Metric","~",8
+"R13","49.9k 0.1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"R14","16.0k 0.1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"U4","TLV75530PDBVR","Package_TO_SOT_SMD:SOT-23-5","https://www.ti.com/lit/ds/symlink/tlv755p.pdf",1
+"C12 C13","2.2uF","Capacitor_SMD:C_0603_1608Metric","~",2
+"Q1","BSS84","Package_TO_SOT_SMD:SOT-23","https://www.onsemi.com/pdf/datasheet/bss84-d.pdf",1
+"Q2 Q3","BSS138","Package_TO_SOT_SMD:SOT-23","https://www.onsemi.com/pdf/datasheet/bss138-d.pdf",2
+"R16 R17","1M","Resistor_SMD:R_0603_1608Metric","~",2
+"R18","330k","Resistor_SMD:R_0603_1608Metric","~",1
+"J2","J_BATT","Connector_JST:JST_PH_B3B-PH-K_1x03_P2.00mm_Vertical","~",1
+"U5","ESP32-S3-MINI-1U-N8","RF_Module:ESP32-S2-MINI-1U","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",1
+"R22 R25 R26 R27","10k","Resistor_SMD:R_0603_1608Metric","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",4
+"C15","1uF","Capacitor_SMD:C_0603_1608Metric","~",1
+"SW2","BOOT","Button_Switch_SMD:SW_SPST_B3U-1000P","~",1
+"R23 R24","4.7k","Resistor_SMD:R_0603_1608Metric","~",2
+"U6 U7","ADS122C04","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","https://www.ti.com/lit/ds/symlink/ads122c04.pdf",2
+"U8","MCP6004","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm","https://ww1.microchip.com/downloads/en/DeviceDoc/MCP6001-1R-1U-2-4-1-MHz-Low-Power-Op-Amp-DS20001733L.pdf",1
+"R28","56k 1%","Resistor_SMD:R_0603_1608Metric","~",1
+"R29","10k 1%","Resistor_SMD:R_0603_1608Metric","~",1
+"R33","33.2k 1%","Resistor_SMD:R_0603_1608Metric","~",1
+"R34","47.5k 1%","Resistor_SMD:R_0603_1608Metric","~",1
+"J3","J_ECG","Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical","~",1
+"J4","J_PPG","Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical","~",1
+"J5","J_TEMP","Connector_JST:JST_PH_B8B-PH-K_1x08_P2.00mm_Vertical","~",1
+"TP1","OS","TestPoint:TestPoint_Pad_D1.5mm","~",1
+"J6","J_GSR","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1
+"J7","J_RESP_T","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1
+"J8","J_RESP_A","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1

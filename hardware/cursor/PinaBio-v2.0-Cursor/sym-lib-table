@@ -12,5 +12,5 @@
   (lib (name "Amplifier_Operational")(type "KiCad")(uri "/usr/share/kicad/symbols/Amplifier_Operational.kicad_sym")(options "")(descr ""))
   (lib (name "RF_Module")(type "KiCad")(uri "/usr/share/kicad/symbols/RF_Module.kicad_sym")(options "")(descr ""))
   (lib (name "power")(type "KiCad")(uri "/usr/share/kicad/symbols/power.kicad_sym")(options "")(descr ""))
-  (lib (name "PinaCursor")(type "KiCad")(uri "/home/ubuntu/work/PinaBio-Paca-v2.0-beta/hardware/cursor/PinaBio-v2.0-Cursor/PinaCursor.kicad_sym")(options "")(descr "TPS63070 and ADS122C04"))
+  (lib (name "PinaCursor")(type "KiCad")(uri "/tmp/pinabio-paca/hardware/cursor/PinaBio-v2.0-Cursor/PinaCursor.kicad_sym")(options "")(descr "TPS63070 and ADS122C04"))
 )

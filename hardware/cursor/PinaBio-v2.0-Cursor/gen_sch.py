@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the PinaBio v.2.0. Cursor schematic from SPEC-0.8."""
+"""Generate the PinaBio v.2.0. Cursor schematic from SPEC-0.9."""
 import re
 import uuid
 from decimal import Decimal, ROUND_HALF_UP
@@ -200,7 +200,8 @@ def load_official():
         ("SW", SYM / "Switch.kicad_sym", "SW_Slide_DPDT", "Switch"),
         ("PUSH", SYM / "Switch.kicad_sym", "SW_Push", "Switch"),
         ("BQ", SYM / "Battery_Management.kicad_sym", "BQ24074RGT", "Battery_Management"),
-        ("ESD", SYM / "Power_Protection.kicad_sym", "USBLC6-2P6", "Power_Protection"),
+        ("ESD", SYM / "Power_Protection.kicad_sym", "USBLC6-2SC6", "Power_Protection"),
+        ("NT", SYM / "Device.kicad_sym", "NetTie_2", "Device"),
         ("BZX", SYM / "Diode.kicad_sym", "BZX84Cxx", "Diode"),
         ("NMOS", SYM / "Transistor_FET.kicad_sym", "Q_NMOS_GSD", "Transistor_FET"),
         ("PMOS", SYM / "Transistor_FET.kicad_sym", "TP0610T", "Transistor_FET"),
@@ -327,6 +328,9 @@ def build_places():
         1,
         {"1": "USB_DM_C", "3": "USB_DP_C", "6": "USB_DM", "4": "USB_DP", "5": "VBUS", "2": "GND"},
     )
+    # 22 ohm between the USBLC6 (connector side already on USB_D*_C) and the ESP32.
+    R("R35", "22", "USB_DM", "USB_DM_IO")
+    R("R36", "22", "USB_DP", "USB_DP_IO")
     R("R3", "0", "VBUS", "VBUS_RAW")
     R("R4", "10.0k", "VBUS", "VLOG")
     R("R5", "15.0k", "VLOG", "GND")
@@ -339,7 +343,7 @@ def build_places():
         1,
         {"3": "VLOG", "1": "GND"},
     )
-    # BQ24074. TMR left open. Pin 15 is ITERM.
+    # BQ24074. Pin 15 is ITERM. Pin 14 is TMR: 46.4 kΩ 1% to ground.
     place(
         "BQ",
         "U2",
@@ -350,7 +354,7 @@ def build_places():
         {
             "15": "ITERM",
             "4": "EN2_CE",
-            "14": None,
+            "14": "TMR",
             "6": "VLOG",
             "5": "EN2_CE",
             "12": "ILIM",
@@ -369,6 +373,7 @@ def build_places():
     )
     R("R6", "2.94k 1%", "ISET", "GND", DS_BQ)
     R("R7", "2.94k 1%", "ITERM", "GND", DS_BQ)
+    R("R37", "46.4k 1%", "TMR", "GND", DS_BQ)
     R("R8", "2.2k", "ILIM", "GND")
     R("R9", "100k", "CHG", "3V3_SYS")
     R("R10", "100k", "PGOOD", "3V3_SYS")
@@ -442,8 +447,8 @@ def build_places():
         1,
         {"1": "3V3_SYS", "3": "3V3_SYS", "2": "GND", "5": "3V0_TEMP"},
     )
-    C("C12", "2.2uF", "3V3_SYS", "GND")
-    C("C13", "2.2uF", "3V0_TEMP", "GND")
+    C("C12", "2.2uF", "3V3_SYS", "GND", C0805)
+    C("C13", "2.2uF", "3V0_TEMP", "GND", C0805)
     R("R15", "0", "3V3_SYS", "3V3_A")
     # Battery divider opens when 3V3_SYS falls
     place("PMOS", "Q1", "BSS84", SOT23, "https://www.onsemi.com/pdf/datasheet/bss84-d.pdf", 1, {"1": "Q1G", "2": "BAT_PROT", "3": "DIV_IN"})
@@ -474,8 +479,8 @@ def build_places():
         "14": "PPG_INT",
         "15": "LO_P",
         "16": "LO_N",
-        "23": "USB_DM",
-        "24": "USB_DP",
+        "23": "USB_DM_IO",
+        "24": "USB_DP_IO",
     }
     for p in pins_of(LIBS["ESP"]["units"], 1):
         if p["num"] in named:
@@ -498,6 +503,7 @@ def build_places():
     C("C16", "10uF", "3V3_SYS", "GND", C0805)
     C("C17", "100nF", "3V3_SYS", "GND")
     place("PUSH", "SW2", "BOOT", "Button_Switch_SMD:SW_SPST_B3U-1000P", "~", 1, {"1": "BOOT", "2": "GND"})
+    R("R38", "10k", "BOOT", "3V3_SYS", DS_ESP)
     R("R23", "4.7k", "SDA_ADC", "3V3_SYS")
     R("R24", "4.7k", "SCL_ADC", "3V3_SYS")
     R("R25", "10k", "PPG_INT", "3V3_SYS")
@@ -512,10 +518,10 @@ def build_places():
             1,
             {
                 "1": a0,
-                "2": "GND",
+                "2": "AGND",
                 "3": "3V3_SYS",
-                "4": "GND",
-                "5": "GND",
+                "4": "AGND",
+                "5": "AGND",
                 "6": "3V3_A",
                 "7": ain2,
                 "8": "3V3_A",
@@ -530,12 +536,12 @@ def build_places():
             },
         )
 
-    ads("U6", "GND", "ECG_DIV", "3V3_A", "3V3_A", "DRDY_ECG")
+    ads("U6", "AGND", "ECG_DIV", "3V3_A", "3V3_A", "DRDY_ECG")
     ads("U7", "3V3_SYS", "OUT_GSR", "OUT_TH", "OUT_AB", "DRDY_SLOW")
-    C("C18", "100nF", "3V3_A", "GND")
-    C("C19", "100nF", "3V3_SYS", "GND")
-    C("C20", "100nF", "3V3_A", "GND")
-    C("C21", "100nF", "3V3_SYS", "GND")
+    C("C18", "100nF", "3V3_A", "AGND")
+    C("C19", "100nF", "3V3_SYS", "AGND")
+    C("C20", "100nF", "3V3_A", "AGND")
+    C("C21", "100nF", "3V3_SYS", "AGND")
     R("R26", "10k", "DRDY_ECG", "3V3_SYS")
     R("R27", "10k", "DRDY_SLOW", "3V3_SYS")
     # MCP6004 followers
@@ -543,23 +549,33 @@ def build_places():
     place("OPA", "U8", "MCP6004", "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm", DS_OPA, 2, by_name("OPA", 2, {"+": "SNS_GSR", "-": "OUT_GSR", "~": "OUT_GSR"}))
     place("OPA", "U8", "MCP6004", "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm", DS_OPA, 3, by_name("OPA", 3, {"+": "SNS_TH", "-": "OUT_TH", "~": "OUT_TH"}))
     place("OPA", "U8", "MCP6004", "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm", DS_OPA, 4, by_name("OPA", 4, {"+": "SNS_AB", "-": "OUT_AB", "~": "OUT_AB"}))
-    place("OPA", "U8", "MCP6004", "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm", DS_OPA, 5, by_name("OPA", 5, {"V+": "3V3_A", "V-": "GND"}))
-    C("C22", "100nF", "3V3_A", "GND")
+    place("OPA", "U8", "MCP6004", "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm", DS_OPA, 5, by_name("OPA", 5, {"V+": "3V3_A", "V-": "AGND"}))
+    C("C22", "100nF", "3V3_A", "AGND")
     R("R28", "56k 1%", "3V3_A", "DIV_EXC")
-    R("R29", "10k 1%", "DIV_EXC", "GND")
+    R("R29", "10k 1%", "DIV_EXC", "AGND")
     R("R30", "100k", "0V5_EXC", "SNS_GSR")
     R("R31", "100k", "0V5_EXC", "SNS_TH")
     R("R32", "100k", "0V5_EXC", "SNS_AB")
     R("R33", "33.2k 1%", "ECG_OUT", "ECG_DIV")
-    R("R34", "47.5k 1%", "ECG_DIV", "GND")
+    R("R34", "47.5k 1%", "ECG_DIV", "AGND")
+    # One short wide join between digital GND and analog AGND, next to the ADCs.
+    place(
+        "NT",
+        "NT1",
+        "GND_TIE",
+        "PinaCursor:GndTie_2mm",
+        "~",
+        1,
+        {"1": "GND", "2": "AGND"},
+    )
     ph = "Connector_JST:JST_PH_B{n}B-PH-K_1x{n:02d}_P2.00mm_Vertical"
-    J(6, "J3", "J_ECG", ["3V3_A", "GND", "ECG_OUT", "LO_P", "LO_N", "3V3_A"], ph.format(n=6))
+    J(6, "J3", "J_ECG", ["3V3_A", "AGND", "ECG_OUT", "LO_P", "LO_N", "3V3_A"], ph.format(n=6))
     J(5, "J4", "J_PPG", ["3V3_SYS", "GND", "SCL_MOD", "SDA_MOD", "PPG_INT"], ph.format(n=5))
     J(8, "J5", "J_TEMP", ["3V0_TEMP", "GND", "SDA_MOD", "SCL_MOD", "OS", "GND", "GND", "GND"], ph.format(n=8))
     place("TP", "TP1", "OS", "TestPoint:TestPoint_Pad_D1.5mm", "~", 1, {"1": "OS"})
-    J(2, "J6", "J_GSR", ["SNS_GSR", "GND"], ph.format(n=2))
-    J(2, "J7", "J_RESP_T", ["SNS_TH", "GND"], ph.format(n=2))
-    J(2, "J8", "J_RESP_A", ["SNS_AB", "GND"], ph.format(n=2))
+    J(2, "J6", "J_GSR", ["SNS_GSR", "AGND"], ph.format(n=2))
+    J(2, "J7", "J_RESP_T", ["SNS_TH", "AGND"], ph.format(n=2))
+    J(2, "J8", "J_RESP_A", ["SNS_AB", "AGND"], ph.format(n=2))
 
 def pack():
     x = D("25.4")
@@ -636,7 +652,8 @@ def emit():
             "SW": "Switch:SW_Slide_DPDT",
             "PUSH": "Switch:SW_Push",
             "BQ": "Battery_Management:BQ24074RGT",
-            "ESD": "Power_Protection:USBLC6-2P6",
+            "ESD": "Power_Protection:USBLC6-2SC6",
+            "NT": "Device:NetTie_2",
             "BZX": "Diode:BZX84Cxx",
             "NMOS": "Transistor_FET:Q_NMOS_GSD",
             "PMOS": "Transistor_FET:TP0610T",
@@ -654,7 +671,7 @@ def emit():
             lib_id = f"Connector_Generic:Conn_01x{int(part['lib'][1:]):02d}"
         symbols.append(
             f'''(symbol (lib_id "{lib_id}") (at {fmt(sx)} {fmt(sy)} 0) (unit {part["unit"]})
-(exclude_from_sim no) (in_bom {"no" if part["ref"].startswith("#") else "yes"}) (on_board {"no" if part["ref"].startswith("#") else "yes"}) (dnp no)
+(exclude_from_sim no) (in_bom {"no" if part["ref"].startswith("#") or part["lib"] == "NT" else "yes"}) (on_board {"no" if part["ref"].startswith("#") else "yes"}) (dnp no)
 (uuid "{uuid.uuid4()}")
 (property "Reference" "{part["ref"]}" (at {fmt(sx)} {fmt(sy - D("1.27"))} 0) (effects (font (size 1.27 1.27))))
 (property "Value" "{part["value"]}" (at {fmt(sx)} {fmt(sy + D("2.54"))} 0) (effects (font (size 1.27 1.27))))
@@ -709,15 +726,17 @@ def emit():
 
     bodies = "\n".join(LIBS[k]["body"] for k in LIBS)
     note = (
-        "PinaBio v.2.0. Cursor. SPEC-0.8. Sensores sin corte en serie. "
+        "PinaBio v.2.0. Cursor. SPEC-0.9. Sensores sin corte en serie. "
         "Interruptor: throw A (pines 1 y 4) es ON. "
         "GPIO4=SDA y GPIO5=SCL del bus ADC; GPIO8=SDA y GPIO9=SCL de los modulos. "
-        "OS del CJMCU-30205 llega a J5 y no tiene GPIO."
+        "OS del CJMCU-30205 llega a J5 y no tiene GPIO. "
+        "GPIO0 tiene 10 kΩ a 3V3_SYS. D+/D− llevan 22 Ω entre USBLC6-2SC6 y el ESP32. "
+        "TMR del BQ24074 lleva 46,4 kΩ a masa. GND y AGND se unen solo en NT1."
     )
     sch = f'''(kicad_sch (version 20250114) (generator "eeschema") (generator_version "9.0") (uuid "{sheet}") (paper "A0")
-(title_block (title "PinaBio v.2.0. Cursor") (date "2026-09-30") (rev "SPEC-0.8")
+(title_block (title "PinaBio v.2.0. Cursor") (date "2026-10-01") (rev "SPEC-0.9")
 (comment 1 "Diseno de competicion Cursor. Sin corte de sensores.")
-(comment 2 "PWR-0.7  TLV75530 solo para CJMCU-30205"))
+(comment 2 "PWR-0.7  TLV75530 solo para CJMCU-30205. Masa digital y analogica."))
 (lib_symbols
 {bodies}
 )
@@ -773,7 +792,7 @@ def bom():
     lines = ["Reference,Value,Footprint,Datasheet,Qty"]
     grouped = {}
     for p in PLACES:
-        if p["ref"].startswith("#"):
+        if p["ref"].startswith("#") or p["lib"] == "NT":
             continue
         if p["ref"] in seen:
             continue

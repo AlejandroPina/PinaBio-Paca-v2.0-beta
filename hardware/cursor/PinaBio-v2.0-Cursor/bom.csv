@@ -2,12 +2,14 @@ Reference,Value,Footprint,Datasheet,Qty
 "J1","USB-C","Connector_USB:USB_C_Receptacle_HCTL_HC-TYPE-C-16P-01A","~",1
 "R1 R2","5.1k","Resistor_SMD:R_0603_1608Metric","~",2
 "U1","USBLC6-2SC6","Package_TO_SOT_SMD:SOT-23-6","https://www.st.com/resource/en/datasheet/usblc6-2.pdf",1
+"R35 R36","22","Resistor_SMD:R_0603_1608Metric","~",2
 "R3 R15","0","Resistor_SMD:R_0603_1608Metric","~",2
 "R4","10.0k","Resistor_SMD:R_0603_1608Metric","~",1
 "R5","15.0k","Resistor_SMD:R_0603_1608Metric","~",1
 "D1","BZX84-C3V6","Package_TO_SOT_SMD:SOT-23","https://assets.nexperia.com/documents/data-sheet/BZX84_SERIES.pdf",1
 "U2","BQ24074","Package_DFN_QFN:VQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm","https://www.ti.com/lit/ds/symlink/bq24074.pdf",1
 "R6 R7","2.94k 1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/bq24074.pdf",2
+"R37","46.4k 1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/bq24074.pdf",1
 "R8","2.2k","Resistor_SMD:R_0603_1608Metric","~",1
 "R9 R10 R11 R12 R19 R20 R21 R30 R31 R32","100k","Resistor_SMD:R_0603_1608Metric","~",10
 "C1","4.7uF","Capacitor_SMD:C_0603_1608Metric","~",1
@@ -20,14 +22,14 @@ Reference,Value,Footprint,Datasheet,Qty
 "R13","49.9k 0.1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
 "R14","16.0k 0.1%","Resistor_SMD:R_0603_1608Metric","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
 "U4","TLV75530PDBVR","Package_TO_SOT_SMD:SOT-23-5","https://www.ti.com/lit/ds/symlink/tlv755p.pdf",1
-"C12 C13","2.2uF","Capacitor_SMD:C_0603_1608Metric","~",2
+"C12 C13","2.2uF","Capacitor_SMD:C_0805_2012Metric","~",2
 "Q1","BSS84","Package_TO_SOT_SMD:SOT-23","https://www.onsemi.com/pdf/datasheet/bss84-d.pdf",1
 "Q2 Q3","BSS138","Package_TO_SOT_SMD:SOT-23","https://www.onsemi.com/pdf/datasheet/bss138-d.pdf",2
 "R16 R17","1M","Resistor_SMD:R_0603_1608Metric","~",2
 "R18","330k","Resistor_SMD:R_0603_1608Metric","~",1
 "J2","J_BATT","Connector_JST:JST_PH_B3B-PH-K_1x03_P2.00mm_Vertical","~",1
 "U5","ESP32-S3-MINI-1U-N8","RF_Module:ESP32-S2-MINI-1U","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",1
-"R22 R25 R26 R27","10k","Resistor_SMD:R_0603_1608Metric","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",4
+"R22 R38 R25 R26 R27","10k","Resistor_SMD:R_0603_1608Metric","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",5
 "C15","1uF","Capacitor_SMD:C_0603_1608Metric","~",1
 "SW2","BOOT","Button_Switch_SMD:SW_SPST_B3U-1000P","~",1
 "R23 R24","4.7k","Resistor_SMD:R_0603_1608Metric","~",2

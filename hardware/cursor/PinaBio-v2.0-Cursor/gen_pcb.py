@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Place and route PinaBio v.2.0. Cursor. Four layers, one ground."""
+"""Place and route PinaBio v.2.0. Cursor. Four layers, split ground."""
 import heapq
 import math
 import re
@@ -15,8 +15,21 @@ VIA_DRILL = 250_000
 CELL = 200_000
 
 # Nets that stay on the planes: a via (or a through-hole pad) is enough.
-ZONE_NETS = {"/GND", "/3V3_SYS"}
+ZONE_NETS = {"/GND", "/AGND", "/3V3_SYS"}
 WIDE = {"/SYS", "/BAT_PROT", "/VBUS", "/VBUS_RAW", "/3V3_A", "/3V0_TEMP", "/SW_L1", "/SW_L2"}
+ANALOG_NETS = {
+    "/ECG_OUT",
+    "/ECG_DIV",
+    "/SNS_GSR",
+    "/SNS_TH",
+    "/SNS_AB",
+    "/OUT_GSR",
+    "/OUT_TH",
+    "/OUT_AB",
+    "/0V5_EXC",
+    "/DIV_EXC",
+    "/3V3_A",
+}
 
 # Anchors are footprint origins in millimetres, Y down. USB sits under the
 # module so D+/D− (module edge +Y) face the receptacle. The buck is on the
@@ -26,22 +39,28 @@ FIXED = {
     "SW1": (16.5, 5.2, 0),
     "U2": (16.2, 12.2, 270),
     "U3": (16.2, 23.2, 180),
-    "L1": (10.4, 23.2, 0),
-    "U5": (38.0, 16.5, 0),
+    # Pads face the switch pins so both nodes stay short on F.Cu.
+    "L1": (11.6, 23.2, 270),
+    # Antenna end of the MINI-1U is local -Y. Sit that end on the board edge.
+    "U5": (38.0, 9.0, 0),
     "U1": (37.6, 27.3, 90),
     "J1": (38.0, 35.6, 0),
-    "SW2": (27.2, 12.4, 90),
+    "SW2": (20.8, 12.4, 90),
     "U6": (56.5, 14.5, 0),
     "U7": (56.5, 22.6, 0),
     "U8": (69.2, 18.6, 0),
-    "U4": (56.5, 31.2, 0),
-    "J5": (78.6, 8.2, 270),
-    "J4": (78.6, 28.6, 270),
+    # LDO stays on digital ground, with the temperature connector.
+    "U4": (22.0, 42.0, 0),
+    "J5": (14.5, 53.2, 0),
+    "J4": (4.8, 27.0, 270),
     "J3": (78.6, 44.2, 270),
-    "J6": (5.6, 33.5, 180),
-    "J7": (5.6, 40.2, 180),
-    "J8": (5.6, 46.9, 180),
-    "TP1": (69.0, 31.0, 0),
+    # GSR and the bands sit in the analog ground, not across the digital plane.
+    "J6": (54.0, 51.2, 0),
+    "J7": (62.5, 51.2, 0),
+    "J8": (70.5, 51.2, 0),
+    "TP1": (30.0, 47.5, 0),
+    "NT1": (49.0, 16.0, 0),
+    "R15": (50.2, 19.6, 90),
     "D1": (23.2, 17.0, 0),
     "Q1": (27.0, 28.6, 0),
     "Q2": (27.0, 32.6, 180),
@@ -86,7 +105,6 @@ ATTACH = {
     "R12": ("SW1", "5"),
     "R13": ("U3", "5"),
     "R14": ("U3", "5"),
-    "R15": ("U6", "12"),
     "R16": ("Q1", "1"),
     "R17": ("Q1", "3"),
     "R18": ("U5", "5"),
@@ -106,6 +124,10 @@ ATTACH = {
     "R32": ("U8", "12"),
     "R33": ("U6", "11"),
     "R34": ("U6", "11"),
+    "R35": ("U1", "6"),
+    "R36": ("U1", "4"),
+    "R37": ("U2", "14"),
+    "R38": ("U5", "4"),
 }
 
 
@@ -173,6 +195,39 @@ def rot_xy(x, y, rot):
     if r == 270:
         return -y, x
     raise SystemExit(f"bad rot {rot}")
+
+
+# IC pads need a clear stub outward. A courtyard over that stub walls the pin.
+IC_REFS = ("U2", "U3", "U5", "U6", "U7", "U8")
+
+
+def blocks_channel(box, fps, host, pin):
+    """True when the part covers another IC pad's outward escape."""
+    reach = nm(2.4)
+    half = nm(0.40)
+    for ref, fp in fps.items():
+        if ref not in IC_REFS:
+            continue
+        cen = fp.GetPosition()
+        for pad in fp.Pads():
+            if ref == host and pad.GetNumber() == pin:
+                continue
+            if pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+                continue
+            pos = pad.GetPosition()
+            ox, oy = pos.x - cen.x, pos.y - cen.y
+            mag = math.hypot(ox, oy) or 1.0
+            farx = pos.x + ox / mag * reach
+            fary = pos.y + oy / mag * reach
+            ch = (
+                min(pos.x, farx) - half,
+                min(pos.y, fary) - half,
+                max(pos.x, farx) + half,
+                max(pos.y, fary) + half,
+            )
+            if box[2] > ch[0] and ch[2] > box[0] and box[3] > ch[1] and ch[3] > box[1]:
+                return True
+    return False
 
 
 def place_all(board, comps):
@@ -246,15 +301,19 @@ def place_all(board, comps):
         fp.SetValue(comps[ref]["value"])
         hide_text(fp)
         placed = False
-        # The module antenna looks out of local -Y. Keep that strip empty.
-        ant_x0, ant_x1 = nm(38.0 - 9.0), nm(38.0 + 9.0)
-        ant_y1 = nm(16.5 - 7.4)
+        reject = {"overlap": 0, "edge": 0, "ant": 0, "channel": 0}
+        # The MINI-1U U.FL looks out of local -Y. Nothing may sit past that end,
+        # and the strip under the antenna end stays empty.
+        ec = fps["U5"].GetPosition()
+        ant_x0, ant_x1 = ec.x - nm(9.0), ec.x + nm(9.0)
+        ant_top = ec.y - nm(7.95)
+        ant_y1 = ant_top + nm(1.0)
         # Resistors stay off the pin so a via can land in the corridor.
         # Capacitors stay close: they are the decoupling.
         dists = (
-            (2.15, 2.55, 3.05, 3.6, 4.3, 5.1, 6.0, 7.2)
+            (2.15, 2.55, 3.05, 3.6, 4.3, 5.1, 6.0, 7.2, 8.6, 10.0)
             if ref.startswith("C")
-            else (3.8, 4.5, 5.3, 6.2, 7.2, 8.4, 9.6)
+            else (3.8, 4.5, 5.3, 6.2, 7.2, 8.4, 9.6, 11.0, 12.6)
         )
         for dist in dists:
             if placed:
@@ -269,10 +328,16 @@ def place_all(board, comps):
                     set_pose(fp, x, y, rot)
                     box = courtyard(fp)
                     if any(overlap(box, b) for _, b in boxes):
+                        reject["overlap"] += 1
                         continue
-                    if box[0] < nm(-1) or box[1] < nm(0.4) or box[2] > nm(90) or box[3] > nm(68):
+                    if box[0] < nm(-1) or box[1] < ant_top - nm(0.02) or box[2] > nm(92) or box[3] > nm(70):
+                        reject["edge"] += 1
                         continue
                     if box[2] > ant_x0 and box[0] < ant_x1 and box[1] < ant_y1:
+                        reject["ant"] += 1
+                        continue
+                    if blocks_channel(box, fps, host, pin):
+                        reject["channel"] += 1
                         continue
                     board.Add(fp)
                     fps[ref] = fp
@@ -280,7 +345,7 @@ def place_all(board, comps):
                     placed = True
                     break
         if not placed:
-            for rad in [i * 0.7 for i in range(2, 18)]:
+            for rad in [i * 0.7 for i in range(2, 22)]:
                 if placed:
                     break
                 for step in range(20):
@@ -293,10 +358,16 @@ def place_all(board, comps):
                         set_pose(fp, x, y, rot)
                         box = courtyard(fp)
                         if any(overlap(box, b) for _, b in boxes):
+                            reject["overlap"] += 1
                             continue
-                        if box[0] < nm(-1) or box[1] < nm(0.4) or box[2] > nm(90) or box[3] > nm(68):
+                        if box[0] < nm(-1) or box[1] < ant_top - nm(0.02) or box[2] > nm(92) or box[3] > nm(70):
+                            reject["edge"] += 1
                             continue
                         if box[2] > ant_x0 and box[0] < ant_x1 and box[1] < ant_y1:
+                            reject["ant"] += 1
+                            continue
+                        if blocks_channel(box, fps, host, pin):
+                            reject["channel"] += 1
                             continue
                         board.Add(fp)
                         fps[ref] = fp
@@ -304,6 +375,10 @@ def place_all(board, comps):
                         placed = True
                         break
         if not placed:
+            print(
+                f"no spot for {ref} near {host}.{pin} pad {px/1e6:.2f},{py/1e6:.2f} "
+                f"ant {ant_x0/1e6:.2f}-{ant_x1/1e6:.2f} y {ant_top/1e6:.2f}-{ant_y1/1e6:.2f} {reject}"
+            )
             raise SystemExit(f"no spot for {ref} near {host}.{pin}")
         p = fps[ref].GetPosition()
         print(f"placed {ref:4} {p.x/1e6:6.2f},{p.y/1e6:6.2f}")
@@ -387,9 +462,9 @@ def setup(board):
     nc.SetViaDrill(VIA_DRILL)
     tb = board.GetTitleBlock()
     tb.SetTitle("PinaBio v.2.0. Cursor")
-    tb.SetRevision("SPEC-0.8")
-    tb.SetDate("2026-09-30")
-    tb.SetComment(0, "Cuatro capas. In1 masa, In2 3V3_SYS.")
+    tb.SetRevision("SPEC-0.9")
+    tb.SetDate("2026-10-01")
+    tb.SetComment(0, "In1 masa partida. In2 3V3_SYS, sin senales.")
 
 
 def add_track(board, x1, y1, x2, y2, width, layer, net):
@@ -476,6 +551,8 @@ class World:
         self.tracks = []  # (x1,y1,x2,y2,w,layer,netname)
         self.vias = []  # (x,y,netname)
         self.keepouts = []
+        self.analog_min_x = None
+        self.analog_nets = set()
         self.added = []  # pcbnew items, so a failed net can be rolled back
         self.channels = []
         for fp in board.GetFootprints():
@@ -488,10 +565,10 @@ class World:
                 pos = pad.GetPosition()
                 ox, oy = pos.x - cen.x, pos.y - cen.y
                 mag = math.hypot(ox, oy) or 1.0
-                reach = nm(2.0)
+                reach = nm(1.20)
                 farx = pos.x + ox / mag * reach
                 fary = pos.y + oy / mag * reach
-                half = nm(0.28)
+                half = nm(0.15)
                 self.channels.append(
                     (
                         min(pos.x, farx) - half,
@@ -530,6 +607,14 @@ class World:
             py = y1 + (y2 - y1) * t
             if self.in_keepout(px, py):
                 return False
+            if layer == pcbnew.F_Cu and self.in_foreign_channel(px, py, netname):
+                return False
+            if (
+                self.analog_min_x is not None
+                and netname in self.analog_nets
+                and px < self.analog_min_x
+            ):
+                return False
             if not (x0 + margin < px < x1o - margin and y0 + margin < py < y1o - margin):
                 # a pad may legally sit closer than the track margin if this
                 # sample is inside that same-net pad
@@ -565,14 +650,33 @@ class World:
                 return False
         return True
 
-    def in_keepout(self, x, y):
+    def in_keepout(self, x, y, margin=0):
         for x0, y0, x1, y1 in self.keepouts:
+            if x0 - margin <= x <= x1 + margin and y0 - margin <= y <= y1 + margin:
+                return True
+        return False
+
+    def in_foreign_channel(self, x, y, netname):
+        """Front escape in front of an IC pad belongs to that pad's net."""
+        if netname in WIDE or netname in ZONE_NETS:
+            return False
+        for x0, y0, x1, y1, owner in self.channels:
+            if owner == netname:
+                continue
             if x0 <= x <= x1 and y0 <= y <= y1:
                 return True
         return False
 
     def via_ok(self, x, y, netname):
-        if self.in_keepout(x, y):
+        if self.in_keepout(x, y, VIA_D / 2):
+            return False
+        if self.in_foreign_channel(x, y, netname):
+            return False
+        if (
+            self.analog_min_x is not None
+            and netname in self.analog_nets
+            and x < self.analog_min_x
+        ):
             return False
         if not self.inside(x, y, nm(0.30) + VIA_D / 2):
             return False
@@ -691,6 +795,31 @@ def route_pair_layer(world, a, b, width, net, layer):
             p1 = (a[0] + ox, a[1] + oy)
             p2 = (b[0] + ox, b[1] + oy)
             if try_poly(world, [a, p1, p2, b], width, layer, net):
+                return True
+    return False
+
+
+def route_inductor(world, pads, net):
+    """Both switch nodes stay on F.Cu at 0.40 mm. No via, no thin neck."""
+    if len(pads) != 2:
+        print("  inductor pad count", net.GetNetname(), len(pads))
+        return False
+    width = nm(0.40)
+    a = (pads[0].GetPosition().x, pads[0].GetPosition().y)
+    b = (pads[1].GetPosition().x, pads[1].GetPosition().y)
+    if route_pair_layer(world, a, b, width, net, pcbnew.F_Cu):
+        return True
+    ax, ay = a
+    bx, by = b
+    for dist in (nm(0.45), nm(-0.45), nm(0.9), nm(-0.9), nm(1.3), nm(-1.3)):
+        candidates = (
+            [(ax, ay), (bx, ay + dist), (bx, by)],
+            [(ax, ay), (ax, by + dist), (bx, by)],
+            [(ax, ay), (ax + dist, ay), (ax + dist, by), (bx, by)],
+            [(ax, ay), (bx + dist, ay), (bx + dist, by), (bx, by)],
+        )
+        for pts in candidates:
+            if try_poly(world, pts, width, pcbnew.F_Cu, net):
                 return True
     return False
 
@@ -883,9 +1012,11 @@ def drop_via(world, pad, net):
     return (x, y)
 
 
-def route_signals(board, nets, world):
+def route_signals(board, nets, world, only=None):
     failed = []
     names = [n for n in nets if n not in ZONE_NETS and not n.startswith("unconnected-")]
+    if only is not None:
+        names = [n for n in names if n in only]
     # Per-net fanout only. A global fanout fills the back layer and blocks the rest.
     fanout = {}
     for name in []:
@@ -908,9 +1039,31 @@ def route_signals(board, nets, world):
     print("fanout nets", len(fanout), "of", len(names))
     # short USB and the switch node first
     def rank(n):
-        if n in ("/USB_DM", "/USB_DP", "/USB_DM_C", "/USB_DP_C", "/SW_L1", "/SW_L2"):
+        if n in (
+            "/SW_L1",
+            "/SW_L2",
+            "/OUT_GSR",
+            "/OUT_TH",
+            "/TS",
+            "/TPS_EN",
+            "/SNS_GSR",
+            "/DRDY_ECG",
+            "/TMR",
+            "/ISET",
+            "/ITERM",
+            "/ILIM",
+            "/VBUS_G",
+            "/LO_N",
+            "/LO_P",
+            "/EN_MOD",
+            "/SCL_ADC",
+            "/USB_DM_C",
+            "/VBUS_N",
+        ):
             return 0
-        return 1
+        if n in WIDE or n in ("/USB_DM", "/USB_DP", "/USB_DM_C", "/USB_DP_C"):
+            return 1
+        return 2
 
     names.sort(key=lambda n: (rank(n), -len(nets[n]), n))
     for name in names:
@@ -941,6 +1094,15 @@ def route_signals(board, nets, world):
             print("UNROUTED", name, "fanout-join")
             failed.append(name)
             continue
+        if name in ("/SW_L1", "/SW_L2"):
+            net = board.FindNet(name)
+            if route_inductor(world, pads, net):
+                print("routed", name, "F.Cu 0.40")
+            else:
+                print("UNROUTED", name, "inductor")
+                failed.append(name)
+            continue
+        mark0 = world.mark()
         width = track_width(name)
         net = board.FindNet(name)
         conn = [pads[0]]
@@ -965,9 +1127,23 @@ def route_signals(board, nets, world):
         if rest:
             # Bridge whatever is still loose with a back-side via on each side.
             front_ok = escape_and_b(world, rest + conn[:1], width, net)
+        if not front_ok and rest:
+            mark = world.mark()
+            pending = list(rest)
+            front_ok = True
+            for target in pending:
+                if maze_connect(world, conn, target, min(width, nm(0.20)), net):
+                    conn.append(target)
+                    rest.remove(target)
+                else:
+                    front_ok = False
+                    break
+            if not front_ok:
+                world.rollback(mark)
         if front_ok:
             print("routed", name, len(pads))
         else:
+            world.rollback(mark0)
             print("UNROUTED", name, len(pads))
             failed.append(name)
     return failed
@@ -1049,6 +1225,19 @@ def escape_and_b(world, pads, width, net):
     return ok
 
 
+def nearest_via(world, x, y, name):
+    if world.via_ok(x, y, name):
+        return int(x), int(y)
+    for radius in (0.3, 0.55, 0.85, 1.2, 1.6, 2.1):
+        for step in range(12):
+            ang = step * math.pi / 6
+            xx = int(x + math.cos(ang) * nm(radius))
+            yy = int(y + math.sin(ang) * nm(radius))
+            if world.via_ok(xx, yy, name):
+                return xx, yy
+    return None
+
+
 def maze_connect(world, sources, target, width, net):
     """Grid A* on F and B from source pads (and their escapes) to the target pad."""
     name = net.GetNetname()
@@ -1064,11 +1253,38 @@ def maze_connect(world, sources, target, width, net):
 
     blocked = [set(), set()]
     via_block = set()
+    for kx0, ky0, kx1, ky1 in world.keepouts:
+        i0, j0 = cid(kx0, ky0)
+        i1, j1 = cid(kx1, ky1)
+        for i in range(max(0, i0), min(nx, i1 + 2)):
+            for j in range(max(0, j0), min(ny, j1 + 2)):
+                blocked[0].add((i, j))
+                blocked[1].add((i, j))
+                via_block.add((i, j))
+    if name not in WIDE and name not in ZONE_NETS:
+        for x0c, y0c, x1c, y1c, owner in world.channels:
+            if owner == name:
+                continue
+            i0, j0 = cid(x0c, y0c)
+            i1, j1 = cid(x1c, y1c)
+            for i in range(max(0, i0), min(nx, i1 + 2)):
+                for j in range(max(0, j0), min(ny, j1 + 2)):
+                    cx, cy = npos(i, j)
+                    if x0c <= cx <= x1c and y0c <= cy <= y1c:
+                        blocked[0].add((i, j))
+                        via_block.add((i, j))
+    if name in world.analog_nets and world.analog_min_x is not None:
+        limit = cid(world.analog_min_x, y0)[0]
+        for i in range(0, max(0, limit)):
+            for j in range(ny):
+                blocked[0].add((i, j))
+                blocked[1].add((i, j))
     for rect, ly, pname, _pad in world.pad_obs:
         if pname == name:
             continue
         layers = (0, 1) if ly is None else ((0,) if ly == pcbnew.F_Cu else (1,))
-        grow = CLR + width / 2
+        # Half a cell extra so a straight run between open cells still clears the pad.
+        grow = CLR + width / 2 + CELL // 2
         for li in layers:
             i0, j0 = cid(rect[0] - grow, rect[1] - grow)
             i1, j1 = cid(rect[2] + grow, rect[3] + grow)
@@ -1181,7 +1397,8 @@ def maze_connect(world, sources, target, width, net):
                 break
         i, j, layer = cur
         expansions += 1
-        if expansions > 250000:
+        if expansions > 1200000:
+            print("  maze limit", name, expansions)
             break
         for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             ni, nj = i + di, j + dj
@@ -1205,12 +1422,19 @@ def maze_connect(world, sources, target, width, net):
             break
         other = 1 - layer
         nxt = (i, j, other)
-        if nxt not in seen and (i, j) not in via_block and (i, j) not in blocked[0] and (i, j) not in blocked[1]:
+        cx, cy = npos(i, j)
+        if (
+            nxt not in seen
+            and (i, j) not in blocked[0]
+            and (i, j) not in blocked[1]
+            and world.via_ok(cx, cy, name)
+        ):
             seen.add(nxt)
             ncost = cost + 6
             heapq.heappush(heap, (ncost + heuristic(i, j), ncost, nxt))
             prev[nxt] = cur
     if not found:
+        print("  maze miss", name, "exp", expansions)
         return False
     path = []
     cur = found
@@ -1218,6 +1442,17 @@ def maze_connect(world, sources, target, width, net):
         path.append(cur)
         cur = prev[cur]
     path.reverse()
+    if len(path) < 2:
+        tx, ty = target.GetPosition().x, target.GetPosition().y
+        stacked = any(
+            abs(p.GetPosition().x - tx) < nm(0.08) and abs(p.GetPosition().y - ty) < nm(0.08)
+            for p in sources
+        )
+        # USB-C stacks the A and B pins of one net on the same copper.
+        if stacked:
+            return True
+        print("  maze short", name)
+        return False
     # lay, snapping the ends onto the nearest source pad and the target
     def nearest_source(i, j):
         x, y = npos(i, j)
@@ -1230,15 +1465,18 @@ def maze_connect(world, sources, target, width, net):
     pts = []
     for i, j, layer in path:
         pts.append([npos(i, j)[0], npos(i, j)[1], layer])
+    # Prepend the pad centre instead of moving the first leg, so a long run
+    # does not chord across the neighbouring pad.
     sx, sy = nearest_source(path[0][0], path[0][1])
-    pts[0][0], pts[0][1] = sx, sy
+    if abs(pts[0][0] - sx) > nm(0.05) or abs(pts[0][1] - sy) > nm(0.05):
+        pts.insert(0, [sx, sy, 0])
     tx, ty = target.GetPosition().x, target.GetPosition().y
-    # if we finished on the escape cell, append the pad
     end_on_pad = (path[-1][0], path[-1][1]) in set(pad_cells(target)) and path[-1][2] == 0
-    if not end_on_pad:
-        pts.append([tx, ty, 0])
+    if end_on_pad:
+        if abs(pts[-1][0] - tx) > nm(0.05) or abs(pts[-1][1] - ty) > nm(0.05):
+            pts.append([tx, ty, pts[-1][2]])
     else:
-        pts[-1][0], pts[-1][1] = tx, ty
+        pts.append([tx, ty, 0])
     # drop collinear
     compact = [pts[0]]
     for p in pts[1:]:
@@ -1248,18 +1486,55 @@ def maze_connect(world, sources, target, width, net):
                 compact[-1] = p
                 continue
         compact.append(p)
-    # commit, checking clearance; if a segment fails, abort this path
+    # Snap each layer change onto a via that actually clears, before checking tracks.
+    for p, q in zip(compact, compact[1:]):
+        if p[2] == q[2]:
+            continue
+        spot = nearest_via(world, p[0], p[1], name)
+        if spot is None:
+            print("  maze via", name)
+            return False
+        p[0], p[1] = spot
+        q[0], q[1] = spot
+    def jogged(x1, y1, x2, y2, layer):
+        options = [[(x1, y1), (x2, y2)]]
+        dx, dy = x2 - x1, y2 - y1
+        for dist in (
+            nm(0.25),
+            nm(-0.25),
+            nm(0.45),
+            nm(-0.45),
+            nm(0.70),
+            nm(-0.70),
+            nm(1.05),
+            nm(-1.05),
+        ):
+            if abs(dx) >= abs(dy):
+                options.append([(x1, y1), (x1, y1 + dist), (x2, y1 + dist), (x2, y2)])
+            else:
+                options.append([(x1, y1), (x1 + dist, y1), (x2 + dist, y1), (x2, y2)])
+        options.append([(x1, y1), (x2, y1), (x2, y2)])
+        options.append([(x1, y1), (x1, y2), (x2, y2)])
+        for pts in options:
+            pairs = list(zip(pts, pts[1:]))
+            if all(
+                world.track_ok(a[0], a[1], b[0], b[1], width, layer, name) for a, b in pairs
+            ):
+                return [(a[0], a[1], b[0], b[1]) for a, b in pairs]
+        return None
+
     staged = []
     for p, q in zip(compact, compact[1:]):
         if p[2] != q[2]:
-            if not world.via_ok(p[0], p[1], name):
-                return False
             staged.append(("via", p[0], p[1]))
         else:
             layer = pcbnew.F_Cu if p[2] == 0 else pcbnew.B_Cu
-            if not world.track_ok(p[0], p[1], q[0], q[1], width, layer, name):
+            segs = jogged(p[0], p[1], q[0], q[1], layer)
+            if segs is None:
+                print("  maze track", name)
                 return False
-            staged.append(("track", p[0], p[1], q[0], q[1], layer))
+            for x1, y1, x2, y2 in segs:
+                staged.append(("track", x1, y1, x2, y2, layer))
     for item in staged:
         if item[0] == "via":
             world.commit_via(item[1], item[2], net)
@@ -1313,13 +1588,113 @@ def stitch_zone_net(board, world, net_name):
     return missed
 
 
-def add_zone(board, net_name, outline, layer):
+def copper_hits_pad(world, pad):
+    """True when an F.Cu track of this net already lands on the pad."""
+    name = pad.GetNetname()
+    rect = pad_rect(pad)
+    px, py = pad.GetPosition().x, pad.GetPosition().y
+    for x1, y1, x2, y2, _w, layer, tname in world.tracks:
+        if tname != name or layer != pcbnew.F_Cu:
+            continue
+        if dist_point_rect(x1, y1, rect) <= nm(0.02) or dist_point_rect(x2, y2, rect) <= nm(0.02):
+            return True
+        if dist_point_seg(px, py, x1, y1, x2, y2) <= nm(0.05):
+            return True
+    return False
+
+
+def heal_pads(board, world, nets):
+    """Tie SMD pads the router left on the opposite layer from their track."""
+    fixed = 0
+    left = []
+    for name in list(nets):
+        if name.startswith("unconnected-"):
+            continue
+        try:
+            pads = pads_of(board, nets, name)
+        except StopIteration:
+            continue
+        net = board.FindNet(name)
+        if net is None:
+            continue
+        for pad in pads:
+            if pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+                continue
+            if copper_hits_pad(world, pad):
+                continue
+            pos = pad.GetPosition()
+            if name in ZONE_NETS:
+                near = False
+                for vx, vy, vn in world.vias:
+                    if vn == name and (vx - pos.x) ** 2 + (vy - pos.y) ** 2 <= nm(1.6) ** 2:
+                        near = True
+                        break
+                if near:
+                    continue
+            vias = [(x, y) for x, y, n in world.vias if n == name]
+            vias.sort(key=lambda v: (v[0] - pos.x) ** 2 + (v[1] - pos.y) ** 2)
+            linked = False
+            width = nm(0.15) if name not in WIDE else nm(0.20)
+            for vx, vy in vias[:6]:
+                if (vx - pos.x) ** 2 + (vy - pos.y) ** 2 > nm(12) ** 2:
+                    break
+                if route_pair_layer(world, (pos.x, pos.y), (vx, vy), width, net, pcbnew.F_Cu):
+                    linked = True
+                    break
+            if not linked and name not in ZONE_NETS:
+                others = [p for p in pads if p is not pad and copper_hits_pad(world, p)]
+                others.sort(
+                    key=lambda p: (p.GetPosition().x - pos.x) ** 2 + (p.GetPosition().y - pos.y) ** 2
+                )
+                if others and maze_connect(world, [others[0]], pad, width, net):
+                    linked = True
+                elif others:
+                    ref = pad.GetParentFootprint().GetReference()
+                    print("  heal maze failed", ref, pad.GetNumber(), name)
+            if linked:
+                fixed += 1
+            else:
+                ref = pad.GetParentFootprint().GetReference()
+                left.append(f"{ref}.{pad.GetNumber()} {name}")
+    print("healed", fixed, "left", left)
+    return left
+
+
+def drop_keepout_vias(board, world):
+    """A via whose ring enters the antenna keepout is removed."""
+    removed = 0
+    for item in list(board.GetTracks()):
+        if item.GetClass() != "PCB_VIA":
+            continue
+        p = item.GetPosition()
+        if not world.in_keepout(p.x, p.y, VIA_D / 2):
+            continue
+        if item.GetNetname() not in ZONE_NETS:
+            print("signal via in keepout", item.GetNetname(), p.x / 1e6, p.y / 1e6)
+            continue
+        board.Remove(item)
+        removed += 1
+    world.vias = []
+    world.tracks = []
+    world.added = []
+    for item in board.GetTracks():
+        world.added.append(item)
+        if item.GetClass() == "PCB_VIA":
+            p = item.GetPosition()
+            world.vias.append((p.x, p.y, item.GetNetname()))
+        else:
+            a, c = item.GetStart(), item.GetEnd()
+            world.tracks.append((a.x, a.y, c.x, c.y, item.GetWidth(), item.GetLayer(), item.GetNetname()))
+    print("removed keepout vias", removed)
+    return removed
     net = board.FindNet(net_name)
     zone = pcbnew.ZONE(board)
     zone.SetLayer(layer)
     zone.SetNet(net)
     zone.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
-    zone.SetMinThickness(nm(0.20))
+    # 0.10 mm is under the 0.125 mm via annular ring, so a through via
+    # stitches F.Cu to In1. A 0.20 mm minimum leaves those pours unconnected.
+    zone.SetMinThickness(nm(0.10))
     zone.SetLocalClearance(CLR)
     zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
     zone.SetThermalReliefGap(nm(0.20))
@@ -1341,22 +1716,106 @@ def add_zone(board, net_name, outline, layer):
     return zone
 
 
-def stitch_ground(board, world, outline, keepout):
-    net = board.FindNet("/GND")
-    x0, y0, x1, y1 = outline
-    kx0, ky0, kx1, ky1 = keepout
+def stitch_ground(board, world, rect, net_name):
+    """Via grid inside one ground zone. The keepout rejects vias on its own."""
+    net = board.FindNet(net_name)
+    x0, y0, x1, y1 = rect
     made = 0
-    y = y0 + nm(6)
-    while y < y1 - nm(6):
-        x = x0 + nm(6)
-        while x < x1 - nm(6):
-            if not (kx0 <= x <= kx1 and ky0 <= y <= ky1) and world.via_ok(x, y, "/GND"):
+    y = y0 + nm(4)
+    while y < y1 - nm(3):
+        x = x0 + nm(4)
+        while x < x1 - nm(3):
+            if world.via_ok(x, y, net_name):
                 world.commit_via(int(x), int(y), net)
                 made += 1
-            x += nm(12)
-        y += nm(12)
-    print("gnd grid vias", made)
-    return []
+            x += nm(8)
+        y += nm(8)
+    print(f"stitch grid {net_name}", made)
+    return made
+
+
+def add_zone_pts(board, net_name, pts, layer):
+    net = board.FindNet(net_name)
+    zone = pcbnew.ZONE(board)
+    zone.SetLayer(layer)
+    zone.SetNet(net)
+    zone.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
+    # 0.10 mm is under the 0.125 mm via annular ring, so a through via
+    # stitches F.Cu to In1. A 0.20 mm minimum leaves those pours unconnected.
+    zone.SetMinThickness(nm(0.10))
+    zone.SetLocalClearance(CLR)
+    zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
+    zone.SetThermalReliefGap(nm(0.20))
+    zone.SetThermalReliefSpokeWidth(nm(0.30))
+    zone.SetAssignedPriority(1)
+    ol = zone.Outline()
+    ol.NewOutline()
+    for x, y in pts:
+        ol.Append(int(x), int(y))
+    board.Add(zone)
+    return zone
+
+
+def ground_split(fps):
+    """Digital zone ends on NT1 pin 1; analog zone starts at pin 2."""
+    pads = {p.GetNumber(): p for p in fps["NT1"].Pads()}
+    p1 = pads["1"].GetPosition()
+    p2 = pads["2"].GetPosition()
+    if p1.x > p2.x:
+        raise SystemExit("NT1 pin 1 is not on the digital side of the tie")
+    half = nm(0.48)
+    digital_x1 = p1.x + half + nm(0.30)
+    analog_x0 = p2.x - half - nm(0.30)
+    if digital_x1 >= analog_x0:
+        raise SystemExit(f"ground zones overlap {digital_x1} {analog_x0}")
+    return digital_x1, analog_x0
+
+
+def notched(rect, keepout):
+    """Rectangle with the antenna keepout cut out of the top edge."""
+    x0, y0, x1, y1 = rect
+    kx0, _ky0, kx1, ky1 = keepout
+    kx0 = max(x0, min(kx0, x1))
+    kx1 = max(x0, min(kx1, x1))
+    ky1 = max(y0, min(ky1, y1))
+    if kx1 - kx0 < nm(0.5) or ky1 <= y0:
+        return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    return [
+        (x0, y0),
+        (kx0, y0),
+        (kx0, ky1),
+        (kx1, ky1),
+        (kx1, y0),
+        (x1, y0),
+        (x1, y1),
+        (x0, y1),
+    ]
+
+
+def assert_layout(board, keepout):
+    for name in ("/SW_L1", "/SW_L2"):
+        seen = False
+        for t in board.GetTracks():
+            if t.GetNetname() != name:
+                continue
+            seen = True
+            if t.GetClass() == "PCB_VIA":
+                raise SystemExit(f"{name} has a via")
+            if t.GetLayer() != pcbnew.F_Cu or t.GetWidth() < nm(0.39):
+                raise SystemExit(f"{name} leaves F.Cu 0.40 mm")
+        if not seen:
+            raise SystemExit(f"{name} has no copper")
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            continue
+        if t.GetLayer() in (pcbnew.In1_Cu, pcbnew.In2_Cu):
+            raise SystemExit(f"data track on {t.GetLayerName()} net {t.GetNetname()}")
+    kx0, ky0, kx1, ky1 = keepout
+    for ref in ("U1", "J1", "U3", "L1"):
+        fp = next(f for f in board.GetFootprints() if f.GetReference() == ref)
+        box = courtyard(fp)
+        if not (box[2] < kx0 or box[0] > kx1 or box[3] < ky0 or box[1] > ky1):
+            raise SystemExit(f"{ref} sits in the antenna keepout")
 
 
 def add_keepout(board, x0, y0, x1, y1):
@@ -1388,35 +1847,76 @@ def main():
     margin = nm(0.8)
     translate(board, -x0 + margin, -y0 + margin)
     x0, y0, x1, y1 = board_box(board)
-    outline = (x0 - margin, y0 - margin, x1 + margin, y1 + margin)
+    esp = fps["U5"]
+    ec = esp.GetPosition()
+    mod_top = ec.y - nm(7.95)
+    top_else = min(
+        courtyard(fp)[1] for fp in board.GetFootprints() if fp.GetReference() != "U5"
+    )
+    if mod_top <= top_else + nm(0.05):
+        top = mod_top - nm(0.45)
+    else:
+        top = y0 - margin
+        print("WARNING antenna end is not the board edge", mod_top / 1e6, top_else / 1e6)
+    outline = (x0 - margin, top, x1 + margin, y1 + margin)
     add_outline(board, *outline)
     w = (outline[2] - outline[0]) / 1e6
     h = (outline[3] - outline[1]) / 1e6
     print(f"outline {w:.2f} x {h:.2f} mm")
+    print(f"antenna edge {mod_top/1e6:.2f} mm, board top {top/1e6:.2f} mm")
     add_nets(board, nets)
     assign_pads(fps, nets)
-    # antenna keepout: past the module's antenna end (local -Y), not over the pads
-    esp = fps["U5"]
-    ec = esp.GetPosition()
-    # Leave a copper channel between the antenna keepout and the module pads.
-    keepout = (ec.x - nm(8.2), outline[1] + nm(0.4), ec.x + nm(8.2), ec.y - nm(8.6))
+    # Under the U.FL end and a little past the module, on every copper layer.
+    keepout = (ec.x - nm(8.15), outline[1], ec.x + nm(8.15), mod_top + nm(0.58))
     add_keepout(board, *keepout)
+    digital_x1, analog_x0 = ground_split(fps)
+    print(f"ground split digital<{digital_x1/1e6:.2f} analog>{analog_x0/1e6:.2f}")
     world = World(board, outline)
     world.keepouts.append(keepout)
+    world.analog_min_x = analog_x0
+    world.analog_nets = set(ANALOG_NETS)
+    for name in ANALOG_NETS:
+        if name not in nets:
+            continue
+        for pad in pads_of(board, nets, name):
+            if pad.GetPosition().x < analog_x0 - nm(0.05):
+                parent = pad.GetParentFootprint().GetReference()
+                print("ANALOG PAD IN DIGITAL", name, parent, pad.GetNumber(), pad.GetPosition().x / 1e6)
     failed = route_signals(board, nets, world)
+    if failed:
+        print("retry", failed)
+        saved_channels = world.channels
+        world.channels = []
+        failed = route_signals(board, nets, world, only=set(failed))
+        world.channels = saved_channels
     missed_p = stitch_zone_net(board, world, "/3V3_SYS")
-    missed_g = stitch_ground(board, world, outline, keepout)
+    missed_g = stitch_zone_net(board, world, "/GND")
+    missed_a = stitch_zone_net(board, world, "/AGND")
+    inset = nm(0.30)
+    dig = (outline[0] + inset, outline[1] + inset, digital_x1, outline[3] - inset)
+    ana = (analog_x0, outline[1] + inset, outline[2] - inset, outline[3] - inset)
+    stitch_ground(board, world, dig, "/GND")
+    stitch_ground(board, world, ana, "/AGND")
+    heal_pads(board, world, nets)
+    drop_keepout_vias(board, world)
     print("adding zones")
-    add_zone(board, "/GND", outline, pcbnew.F_Cu)
-    add_zone(board, "/GND", outline, pcbnew.In1_Cu)
-    add_zone(board, "/3V3_SYS", outline, pcbnew.In2_Cu)
+    for layer in (pcbnew.F_Cu, pcbnew.In1_Cu):
+        add_zone_pts(board, "/GND", notched(dig, keepout), layer)
+        add_zone_pts(board, "/AGND", [(ana[0], ana[1]), (ana[2], ana[1]), (ana[2], ana[3]), (ana[0], ana[3])], layer)
+    power = (
+        outline[0] + inset,
+        outline[1] + inset,
+        outline[2] - inset,
+        outline[3] - inset,
+    )
+    add_zone_pts(board, "/3V3_SYS", notched(power, keepout), pcbnew.In2_Cu)
     out = str(ROOT / "PinaBio-v2.0-Cursor.kicad_pcb")
     board.Save(out)
     print("saved before fill")
     text = pcbnew.PCB_TEXT(board)
     text.SetText("PinaBio v.2.0. Cursor")
     text.SetLayer(pcbnew.F_SilkS)
-    text.SetPosition(pcbnew.VECTOR2I(int(outline[0] + nm(8.2)), int(outline[3] - nm(1.77))))
+    text.SetPosition(pcbnew.VECTOR2I(int(outline[0] + nm(42)), int(outline[3] - nm(1.77))))
     text.SetTextSize(pcbnew.VECTOR2I(nm(0.9), nm(0.9)))
     text.SetTextThickness(nm(0.15))
     board.Add(text)
@@ -1424,14 +1924,18 @@ def main():
     board.Save(out)
     report = (
         f"{w:.2f} x {h:.2f} mm\n"
-        f"layers 4 (F GND pour, In1 GND, In2 3V3_SYS, B signals)\n"
+        f"layers 4 (F and In1 split GND/AGND, In2 3V3_SYS, B signals)\n"
         f"unrouted {failed}\n"
         f"gnd vias missed {missed_g}\n"
+        f"agnd vias missed {missed_a}\n"
         f"3v3 vias missed {missed_p}\n"
     )
     (ROOT / "board-size.txt").write_text(report)
     print(report)
     print("saved", out)
+    assert_layout(board, keepout)
+    if failed:
+        raise SystemExit("unrouted " + " ".join(failed))
     fill_board(out)
 
 

@@ -1,12 +1,12 @@
 %TF.GenerationSoftware,KiCad,Pcbnew,9.0.9-9.0.9~ubuntu24.04.1*%
-%TF.CreationDate,2026-10-02T09:38:45+00:00*%
+%TF.CreationDate,2026-10-02T11:16:57+00:00*%
 %TF.ProjectId,PinaBio-v2.0-Cursor,50696e61-4269-46f2-9d76-322e302d4375,SPEC-0.9*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Soldermask,Bot*%
 %TF.FilePolarity,Negative*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 9.0.9-9.0.9~ubuntu24.04.1) date 2026-10-02 09:38:45*
+G04 Created by KiCad (PCBNEW 9.0.9-9.0.9~ubuntu24.04.1) date 2026-10-02 11:16:57*
 %MOMM*%
 %LPD*%
 G01*
@@ -91,10 +91,6 @@ D11*
 X15845000Y-52995000D03*
 X17845000Y-52995000D03*
 X19845000Y-52995000D03*
-X21845000Y-52995000D03*
-X23845000Y-52995000D03*
-X25845000Y-52995000D03*
-X27845000Y-52995000D03*
 %TD*%
 D12*
 %TO.C,J3*%

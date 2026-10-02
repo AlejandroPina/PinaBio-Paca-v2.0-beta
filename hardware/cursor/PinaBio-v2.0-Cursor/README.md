@@ -34,7 +34,7 @@ El DRC incluye errores y avisos. No queda ninguno. La paridad esquemático–PCB
 - `lib.pretty/GndTie_2mm.kicad_mod`: el único puente entre GND y AGND. Cobre corto y ancho en F.Cu y en In1.Cu, con dos taladros. No entra en el BOM ni en el fichero de posición.
 - Símbolo `ADS122C04` en `PinaCursor.kicad_sym`: patillaje TSSOP-16 PW de SBAS751B, figura 69. Huella oficial `Package_SO:TSSOP-16_4.4x5mm_P0.65mm`.
 
-El resto sale de las bibliotecas de KiCad 9. TLV75530, MCP6004, BSS138, BSS84 y USBLC6-2SC6 son alias del símbolo padre de la biblioteca. Los conectores de sensor y de batería son JST PH de la serie B. La bobina de 1,5 µH usa la huella `L_Coilcraft_XAL4020`, de la misma clase que el XFL4020.
+El resto sale de las bibliotecas de KiCad 9. TLV75530, MCP6004, BSS138, BSS84 y USBLC6-2SC6 son alias del símbolo padre de la biblioteca. Los conectores de sensor y de batería son JST PH de la serie B. J5 (J_TEMP, módulo externo CJMCU-30205) es un JST PH de 4 pines, `JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical`: 3V0_TEMP, GND, SDA_MOD, SCL_MOD. A0, A1 y A2 del módulo se unen a GND en el propio módulo (estaño o hilo corto) y la dirección I²C sigue siendo 0x48. OS del módulo queda sin conectar (el módulo lleva su pull-up de 10 kΩ): no hay red OS, ni punto de prueba, ni GPIO. La bobina de 1,5 µH usa la huella `L_Coilcraft_XAL4020`, de la misma clase que el XFL4020.
 
 ## Reglas de la placa
 
@@ -51,6 +51,8 @@ Estos valores no están en la spec; no son corrientes de módulo:
 - Los 100 nF de desacoplo del op-amp y de los buses.
 - R3 es 0 Ω en serie con VBUS: la spec no da el valor de un fusible, y este puente no abre VBUS.
 - R15 es 0 Ω entre 3V3_SYS y 3V3_A. Es el mismo buck, no un segundo regulador. Está al lado de NT1.
-- GPIO4 = SDA y GPIO5 = SCL del bus de los ADS. GPIO8 = SDA y GPIO9 = SCL de los módulos. El throw A del interruptor (pines 1 y 4) es ON. OS del CJMCU-30205 va a J5 y a TP1; no tiene GPIO, y una red de un solo pin no pasa el ERC.
+- GPIO4 = SDA y GPIO5 = SCL del bus de los ADS. GPIO8 = SDA y GPIO9 = SCL de los módulos. El throw A del interruptor (pines 1 y 4) es ON.
 
 `rework_tps63070.py` (con `rw_router.py`) parte de la placa anterior, cambia U3 por la huella corregida, recoloca L1, C11, R8, R13 y R14 y vuelve a rutear solo la zona del TPS63070. `gen_pcb.py` lleva las mismas posiciones de U3 y L1.
+
+`rework_j5_4pin.py` parte de la placa anterior (J5 de 8 pines con OS y TP1), cambia J5 por la huella de 4 pines, quita TP1, el cobre de OS y las etiquetas de serigrafía de los pines 5 a 8, centra el rótulo TEMP y rellena las zonas. El resto de la placa no se toca.

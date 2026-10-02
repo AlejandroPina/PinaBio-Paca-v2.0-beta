@@ -208,10 +208,9 @@ def load_official():
         ("LDO", SYM / "Regulator_Linear.kicad_sym", "TLV70012_SOT23-5", "Regulator_Linear"),
         ("OPA", SYM / "Amplifier_Operational.kicad_sym", "LM2902", "Amplifier_Operational"),
         ("ESP", SYM / "RF_Module.kicad_sym", "ESP32-S3-MINI-1", "RF_Module"),
-        ("TP", SYM / "Connector.kicad_sym", "TestPoint", "Connector"),
         ("FLAG", SYM / "power.kicad_sym", "PWR_FLAG", "power"),
     ]
-    for n in (2, 3, 5, 6, 8):
+    for n in (2, 3, 4, 5, 6):
         specs.append((f"J{n}", SYM / "Connector_Generic.kicad_sym", f"Conn_01x{n:02d}", "Connector_Generic"))
     for key, path, name, lib in specs:
         body = materialize(path, name, lib)
@@ -571,8 +570,7 @@ def build_places():
     ph = "Connector_JST:JST_PH_B{n}B-PH-K_1x{n:02d}_P2.00mm_Vertical"
     J(6, "J3", "J_ECG", ["3V3_A", "AGND", "ECG_OUT", "LO_P", "LO_N", "3V3_A"], ph.format(n=6))
     J(5, "J4", "J_PPG", ["3V3_SYS", "GND", "SCL_MOD", "SDA_MOD", "PPG_INT"], ph.format(n=5))
-    J(8, "J5", "J_TEMP", ["3V0_TEMP", "GND", "SDA_MOD", "SCL_MOD", "OS", "GND", "GND", "GND"], ph.format(n=8))
-    place("TP", "TP1", "OS", "TestPoint:TestPoint_Pad_D1.5mm", "~", 1, {"1": "OS"})
+    J(4, "J5", "J_TEMP", ["3V0_TEMP", "GND", "SDA_MOD", "SCL_MOD"], ph.format(n=4))
     J(2, "J6", "J_GSR", ["SNS_GSR", "AGND"], ph.format(n=2))
     J(2, "J7", "J_RESP_T", ["SNS_TH", "AGND"], ph.format(n=2))
     J(2, "J8", "J_RESP_A", ["SNS_AB", "AGND"], ph.format(n=2))
@@ -660,7 +658,6 @@ def emit():
             "LDO": "Regulator_Linear:TLV70012_SOT23-5",
             "OPA": "Amplifier_Operational:LM2902",
             "ESP": "RF_Module:ESP32-S3-MINI-1",
-            "TP": "Connector:TestPoint",
             "TPS": "PinaCursor:TPS63070",
             "ADS": "PinaCursor:ADS122C04PW",
             "FLAG": "power:PWR_FLAG",
@@ -729,7 +726,7 @@ def emit():
         "PinaBio v.2.0. Cursor. SPEC-0.9. Sensores sin corte en serie. "
         "Interruptor: throw A (pines 1 y 4) es ON. "
         "GPIO4=SDA y GPIO5=SCL del bus ADC; GPIO8=SDA y GPIO9=SCL de los modulos. "
-        "OS del CJMCU-30205 llega a J5 y no tiene GPIO. "
+        "J5 (J_TEMP) lleva 4 pines: 3V0_TEMP, GND, SDA_MOD, SCL_MOD. A0, A1 y A2 del CJMCU-30205 van a GND en el modulo y OS queda sin conectar. "
         "GPIO0 tiene 10 kΩ a 3V3_SYS. D+/D− llevan 22 Ω entre USBLC6-2SC6 y el ESP32. "
         "TMR del BQ24074 lleva 46,4 kΩ a masa. GND y AGND se unen solo en NT1."
     )

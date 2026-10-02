@@ -61,7 +61,7 @@ La placa no incluye aislamiento galvánico interno ni detecta si hay aislador ex
 |---|---|---|
 | AD8232 externo | 3V3, GND, OUTPUT, LO+, LO−, SDN | Verificar breakout a 3,3 V. ADS ECG: referencia interna 2,048 V, PGA bypass, ganancia 1, 600 SPS. Divisor: 33,2 kΩ desde OUTPUT y 47,5 kΩ a masa, al 1 %. A 3,30 V de salida plena el ADS ve 1,94 V; a 3,40 V ve 2,00 V, por debajo de 2,048 V. No usar 20,0/40,2 kΩ. La medida de la excursión real comprueba que el módulo no recorta antes del divisor. Si OUTPUT ya sale recortada, el divisor no lo corrige. |
 | MAX30102/GY-30102 | 3V3, GND, SCL, SDA, INT | Verificar reguladores, niveles, *pull-ups*, LED y consumo del módulo real. PPG inicialmente 200 pares/s. |
-| CJMCU-30205 | 3V0_TEMP, GND, SDA, SCL, OS, A0, A1, A2 | VCC del módulo va directo al chip: no lleva regulador. A0, A1 y A2 a masa fijan 0x48. Las pull-up del módulo van a su VCC. |
+| CJMCU-30205 | 3V0_TEMP, GND, SDA, SCL (conector de 4 pines) | VCC del módulo va directo al chip: no lleva regulador. A0, A1 y A2 del módulo van a GND en el propio módulo (estaño o hilo corto), no por el cable, y fijan 0x48. OS del módulo queda sin conectar (el módulo lleva su pull-up de 10 kΩ). Las pull-up del módulo van a su VCC. |
 | GSR | Dos electrodos | `0V5_EXC → 100 kΩ → sensor → retorno`; seguidor MCP6004 y ADS lento. Corriente de cortocircuito ≈5 µA. |
 | Bandas tórax/abdomen | Dos hilos por banda | Mismo frontal que GSR, con resistencia fija de 100 kΩ revisable tras medir bandas reales. |
 

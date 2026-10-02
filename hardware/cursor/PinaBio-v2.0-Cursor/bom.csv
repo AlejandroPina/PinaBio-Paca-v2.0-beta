@@ -41,8 +41,7 @@ Reference,Value,Footprint,Datasheet,Qty
 "R34","47.5k 1%","Resistor_SMD:R_0603_1608Metric","~",1
 "J3","J_ECG","Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical","~",1
 "J4","J_PPG","Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical","~",1
-"J5","J_TEMP","Connector_JST:JST_PH_B8B-PH-K_1x08_P2.00mm_Vertical","~",1
-"TP1","OS","TestPoint:TestPoint_Pad_D1.5mm","~",1
+"J5","J_TEMP","Connector_JST:JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical","~",1
 "J6","J_GSR","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1
 "J7","J_RESP_T","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1
 "J8","J_RESP_A","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","~",1

@@ -37,7 +37,7 @@ An external host-powered USB isolator is mandatory for use with a person while U
 | GSR | MCP6004-buffered ≈0.50 V excitation; a physical 100 kΩ series resistor limits normal short-circuit current to ≈5 µA. |
 | Thorax / abdomen | One identical buffered front end each; measure real band ranges before freezing 100 kΩ and filters. |
 | PPG | External MAX30102/GY-30102, 3.3 V, I²C plus INT; validate its actual regulators, pull-ups, LED current and voltage levels. |
-| Temperature | CJMCU-30205 from `3V0_TEMP` only. Module VCC ties straight to the chip. A0, A1 and A2 to ground set address 0x48. |
+| Temperature | CJMCU-30205 from `3V0_TEMP` only, on a 4-pin connector (3V0_TEMP, GND, SDA, SCL). Module VCC ties straight to the chip. A0, A1 and A2 of the module are tied to GND on the module itself (solder or a short wire), not through the cable, and set address 0x48. The module's OS is left unconnected (the module carries its own 10 kΩ pull-up). |
 
 The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OPEN, SHORT, OUT_OF_RANGE and UNCALIBRATED rather than false values. Bands provide resistance and a derived respiratory curve, not lung volume. ADS IDACs remain disabled and never connect to body paths.
 

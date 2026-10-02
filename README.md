@@ -1,3 +1,12 @@
+QUEDA ESTO. No hay nada en marcha.
+
+1. Cable del ECG. El conector de la placa no coincide con el modulo SparkFun si el cable va recto. Hay que decidir si se cruza el cable o se cambia el orden en la placa.
+2. Interruptor. Esta bien conectado, pero no pone ON ni OFF. Hay que mirar la pieza real para saber que lado es ON.
+3. Modulo de pulso. Hace falta una foto del modulo concreto, porque no todos llevan los pines en el mismo orden.
+4. Bobina de 1,5 uH. El BOM no tiene su referencia de fabricante, porque la huella y la hoja de datos no coinciden.
+
+Antes de fabricar, mirar a ojo el trazado nuevo alrededor del TPS63070, sobre todo la masa de debajo. En el modulo de temperatura, unir A0, A1 y A2 a masa.
+
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 
 # PinaBio Paca v2.0 beta — documentación y prototipo KiCad

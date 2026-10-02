@@ -2,8 +2,6 @@
 
 ![PCB PinaBio Paca v2.0, cara superior](pcb-top.png)
 
-Las tres tareas pendientes estan en el archivo TAREAS.txt de esta misma carpeta, junto a esta foto.
-
 
 Diseño de competición en KiCad 9.0.9, solo con lo que queda escrito en SPEC-0.9 / PWR-0.7. Los sensores van a sus conectores sin relé, MOSFET ni conmutador en serie. El aislador USB es externo, en el cable. El BQ24074 entra en standby con el interruptor (EN1, EN2 y CE); no hay MOSFET de corte de VBUS.
 

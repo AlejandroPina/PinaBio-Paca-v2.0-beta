@@ -1,9 +1,3 @@
-TAREAS PENDIENTES. Responde con 1, 2 o 3.
-
-1. Segunda revision con otro modelo del interruptor, el USBLC6, los conectores y los modulos.
-2. BOM con referencias de fabricante, para poder pedir los componentes.
-3. Limpiar los avisos de nombres de huellas. Son 114 y no cambia nada electrico.
-
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 
 # PinaBio Paca v2.0 beta — documentación y prototipo KiCad

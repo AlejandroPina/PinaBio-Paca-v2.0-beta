@@ -1,10 +1,10 @@
-FOTOS DE LOS MODULOS.
+REVISION CON LAS FOTOS.
 
-Temperatura: si. Dos fotos del CJMCU-30205. El orden es VCC, GND, SDA, SCL, OS, A0, A1, A2. Por eso el conector de la placa quedo en 4 pines: 3V0, GND, SDA, SCL. A0, A1 y A2 se unen a masa en el modulo.
+ECG: no esta bien para un cable recto. La foto del modulo rojo dice, de arriba a abajo: GND, 3.3V, OUTPUT, LO-, LO+, SDN. La placa tiene: 3V3, masa, salida, LO+, LO-, SDN. Un cable pin a pin cruza alimentacion y masa, y tambien LO+ con LO-. La salida y SDN si coinciden. Recomiendo cambiar el orden de la placa al de la foto, para que el cable vaya recto.
 
-PPG: si, una foto del modulo morado de 5 agujeros, con el regulador de 1,8 V. En esa foto no se leen los nombres de los pines. No puedo comprobar si el orden de la placa (3V3, GND, SCL, SDA, INT) coincide con el modulo. Hace falta una foto donde se lean SCL, SDA e INT.
+Temperatura: si. La foto dice VCC, GND, SDA, SCL, OS, A0, A1, A2. La placa lleva los cuatro primeros: 3V0, GND, SDA, SCL. A0, A1 y A2 se unen a masa en el modulo. OS se deja sin cable.
 
-ECG: no. No tengo foto del modulo AD8232. La comparacion con SparkFun salio de su esquema publicado, no de una foto tuya. Si me la mandas otra vez, miro el orden de los pines.
+PPG: la foto no alcanza. Se ve un modulo morado de 5 agujeros y el regulador de 1,8 V, pero no se leen SCL, SDA ni INT. No puedo decir si el orden de la placa (3V3, GND, SCL, SDA, INT) es el del modulo.
 
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 

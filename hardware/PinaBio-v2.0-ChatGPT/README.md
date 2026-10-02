@@ -2,7 +2,9 @@
 
 [English](README.en.md) · [Especificación general](../../docs/es/especificacion.md) · [Alimentación y USB](../../docs/es/alimentacion-usb.md)
 
-**Estado: prototipo de ingeniería para revisión. No liberar a fabricación ni conectar a una persona sin las verificaciones pendientes.** El esquemático, la PCB y la BOM son archivos nativos y editables de KiCad 9.0.6. La PCB es de dos capas y 96 × 96 mm, dentro del formato habitual de 100 × 100 mm. El trazado contiene un plano de masa inferior y vertidos de `SYS` y `3V3_SYS` en la capa superior. Las dos conexiones de conmutación entre TPS63070 y bobina están en la misma capa, sin vías.
+**Estado: prototipo de ingeniería para revisión. No liberar a fabricación ni conectar a una persona sin las verificaciones pendientes.** El esquemático, la PCB y la BOM son archivos nativos y editables de KiCad 9.0.6. Esta revisión H1 usa **cuatro capas y 96 × 96 mm**: señales y cobre local en las caras externas, masa continua en In1 y distribución de `3V3_SYS` en In2. Conserva los vertidos exteriores de masa y alimentación. Las dos conexiones TPS63070–bobina siguen en la cara superior, sin vías.
+
+La PCB H1 conserva deliberadamente una **masa interior continua**, a diferencia de la masa partida descrita en `SPEC-0.9` y usada por Cursor. El bus digital de los ADC y otras señales cruzan entre las zonas digital y analógica; mantener una referencia de retorno continua evita obligarlas a rodear una ranura de masa. Es una propuesta de trazado para comparar y medir, no una afirmación de superioridad demostrada. La placa es mayor que la de Cursor y la diferencia de coste exige una cotización real de JLCPCB.
 
 ## Archivos
 
@@ -11,7 +13,7 @@
 - [`PinaBio-v2.0-ChatGPT.kicad_pcb`](PinaBio-v2.0-ChatGPT.kicad_pcb): PCB enrutada.
 - [`PinaBio-v2.0-ChatGPT-BOM.csv`](PinaBio-v2.0-ChatGPT-BOM.csv): BOM por referencia; [`BOM agrupada`](PinaBio-v2.0-ChatGPT-BOM-grouped.csv): 93 posiciones, 54 grupos. **No es una BOM de compra JLCPCB**: faltan códigos LCSC y elegir fabricante para componentes genéricos.
 - [`PinaBio-v2.0-ChatGPT-PinNets.csv`](PinaBio-v2.0-ChatGPT-PinNets.csv): conexión de cada pin numerado del esquema.
-- [`ERC.txt`](ERC.txt) y [`DRC.txt`](DRC.txt): comprobaciones automatizadas; [`PDF del esquema`](preview/PinaBio-v2.0-ChatGPT.pdf) y [`PDF de la cara superior`](preview/pcb-front.pdf) para revisión.
+- [`ERC-H1.txt`](ERC-H1.txt) y [`DRC-H1.txt`](DRC-H1.txt): comprobaciones de esta revisión; [`PDF del esquema`](preview/PinaBio-v2.0-ChatGPT.pdf) y [`vista frontal H1`](preview/pcb-front-H1.pdf) para revisión.
 - `PinaBio-ChatGPT.kicad_sym`, `PinaBio-ChatGPT.pretty`, `sym-lib-table`, `fp-lib-table` y `3dmodels`: bibliotecas locales. [Licencias](LIBRARY-LICENSE.md).
 
 ## Circuitos y conectores
@@ -36,14 +38,15 @@ Los sensores están conectados directamente a sus etapas: **no hay relés, MOSFE
 - ERC de KiCad 9: **0 infracciones**.
 - DRC de KiCad 9: **0 infracciones y 0 conexiones pendientes**.
 - Cotejo de 329 pines conectados entre netlist del esquema y pads de PCB: **0 diferencias**.
-- Las dos pistas TPS63070↔bobina: aproximadamente 4,7 mm cada una, sin vía. La PCB conserva pistas de 0,2 mm en otras redes, de modo que los vertidos de potencia y la caída de tensión deben revisarse con corriente real.
+- Las dos pistas TPS63070↔bobina: aproximadamente 4,7 mm cada una, sin vía. Trece tramos de `BAT_PROT`, `VBUS_RAW` y `SYS` se han ensanchado donde el DRC lo permite; las secciones cercanas a pines y vías conservan su anchura original. Se añadieron dos vías de retorno a la masa interior cerca del ESP32 y de los ADC. Hay que medir la caída de tensión a corriente real.
+- Las capas interiores no contienen pistas de señal. La masa interior permanece continua y el raíl de 3,3 V usa In2.
 
 Estas comprobaciones no validan selección de componentes, corriente, temperatura, ruido analógico, EMC ni seguridad de uso sobre el cuerpo.
 
 ## Pendiente antes de pedir a JLCPCB
 
 1. Confirmar con los **tres módulos reales** pinout, tensión admisible, resistencias de pull-up, picos de corriente y posición de los conectores; adaptar J3/J7/J8 si difieren. J8 es especialmente provisional.
-2. Auditar de forma independiente la huella local `TPS63070_RNM0015A`, orientación de todos los encapsulados, taladros, exposición térmica del BQ24074 y compatibilidad de las referencias concretas con montaje JLCPCB.
+2. Auditar de forma independiente la huella local `TPS63070_RNM0015A`, orientación de todos los encapsulados, taladros, exposición térmica del BQ24074, área del conector U.FL y compatibilidad de las referencias concretas con montaje JLCPCB.
 3. Medir en prototipo el consumo pico de ESP32/PPG, `3V3_SYS`, `3V0_TEMP`, arranque y transiciones ON/OFF/USB, ausencia de carga en ON+USB, temperatura y caída de tensión de pistas y cables. Validar el cable y protección de la LiPo.
 4. Medir ECG, GSR, respiración y ruido de 50/60 Hz con los módulos y electrodos reales; comprobar el aislador externo en el modo ON+USB.
 5. Elegir números de pieza y disponibilidad JLC/LCSC, verificar montaje, añadir fiduciales y generar Gerber, taladros y archivo de posiciones **solo después** de cerrar las comprobaciones anteriores.

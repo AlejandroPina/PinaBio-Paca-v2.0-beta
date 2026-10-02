@@ -57,3 +57,11 @@ Estos valores no están en la spec; no son corrientes de módulo:
 `rework_tps63070.py` (con `rw_router.py`) parte de la placa anterior, cambia U3 por la huella corregida, recoloca L1, C11, R8, R13 y R14 y vuelve a rutear solo la zona del TPS63070. `gen_pcb.py` lleva las mismas posiciones de U3 y L1.
 
 `rework_j5_4pin.py` parte de la placa anterior (J5 de 8 pines con OS y TP1), cambia J5 por la huella de 4 pines, quita TP1, el cobre de OS y las etiquetas de serigrafía de los pines 5 a 8, centra el rótulo TEMP y rellena las zonas. El resto de la placa no se toca.
+
+## Mazos de los módulos
+
+El orden de la placa no se cambia para que el cable vaya recto. El mazo se cablea por nombre de señal.
+
+- PPG, foto GY-30102: VIN, GND, SCL, SDA, INT. Coincide con J4 (3V3, GND, SCL, SDA, INT). El cable puede ir recto.
+- ECG, módulo rojo AD8232: J3 es 3V3, masa, salida, LO+, LO−, SDN. El módulo es GND, 3,3 V, OUTPUT, LO−, LO+, SDN. En el mazo se cruzan alimentación con masa, y LO+ con LO−. Salida y SDN van rectos.
+- Temperatura: J5 es 3V0, GND, SDA, SCL y puede ir recto. A0, A1 y A2 del CJMCU-30205 se unen a masa en el módulo. OS queda sin cable.

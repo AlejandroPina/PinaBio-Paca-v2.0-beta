@@ -1,10 +1,17 @@
-REVISION CON LAS FOTOS.
+MAZOS. La placa no se cambia.
 
-ECG: no esta bien para un cable recto. La foto del modulo rojo dice, de arriba a abajo: GND, 3.3V, OUTPUT, LO-, LO+, SDN. La placa tiene: 3V3, masa, salida, LO+, LO-, SDN. Un cable pin a pin cruza alimentacion y masa, y tambien LO+ con LO-. La salida y SDN si coinciden. Recomiendo cambiar el orden de la placa al de la foto, para que el cable vaya recto.
+PPG: la foto coincide. Orden VIN, GND, SCL, SDA, INT. El cable puede ir recto.
 
-Temperatura: si. La foto dice VCC, GND, SDA, SCL, OS, A0, A1, A2. La placa lleva los cuatro primeros: 3V0, GND, SDA, SCL. A0, A1 y A2 se unen a masa en el modulo. OS se deja sin cable.
+ECG: el cable no va recto, y se deja asi porque cambiar el orden obligaria a rehacer pistas. Mazo, de la placa al modulo rojo:
+1 de la placa (3V3) al 3.3V del modulo.
+2 de la placa (masa) al GND del modulo.
+3 de la placa (salida) al OUTPUT del modulo.
+4 de la placa (LO+) al LO+ del modulo.
+5 de la placa (LO-) al LO- del modulo.
+6 de la placa (SDN) al SDN del modulo.
+O sea: se cruzan alimentacion con masa, y LO+ con LO-.
 
-PPG: la foto no alcanza. Se ve un modulo morado de 5 agujeros y el regulador de 1,8 V, pero no se leen SCL, SDA ni INT. No puedo decir si el orden de la placa (3V3, GND, SCL, SDA, INT) es el del modulo.
+Temperatura: los cuatro pines van rectos (3V0, GND, SDA, SCL). En el modulo, A0, A1 y A2 a masa. OS sin cable.
 
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 

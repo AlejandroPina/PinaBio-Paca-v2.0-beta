@@ -1,5 +1,13 @@
 ![PCB PinaBio Paca v2.0, cara superior](hardware/cursor/PinaBio-v2.0-Cursor/pcb-top.png)
 
+## Conector de batería (J2)
+
+1. Pin 1: positivo de la batería. Cable rojo. Va al cargador.
+2. Pin 2: negativo. Cable negro. Masa.
+3. Pin 3: sensor de temperatura que trae la batería. No es alimentación. El cargador deja de cargar si la pila está demasiado caliente o demasiado fría.
+
+El pin 1 es el extremo marcado del conector JST. La batería tiene que ser una LiPo protegida con ese tercer cable. Si el conector del pack no trae ese orden, cruza los cables: rojo al pin 1, negro al pin 2, sensor al pin 3.
+
 1. El interruptor de la caja es un C&K 7201SYZQE (DPDT ON-ON). La placa deja seis taladros, con ON junto a 1 y 4 y OFF junto a 3 y 6. El cable va de cada taladro al terminal del mismo número.
 2. La bobina de 1,5 µH es Coilcraft XAL4020-152ME. El patrón de tierra de la hoja coincide con la huella XAL4020.
 3. La masa alrededor del TPS63070 está revisada: las vías de GND y PGND están bien y esa zona no se ha movido.

@@ -1,5 +1,6 @@
 ** Drc report for PinaBio-v2.0-ChatGPT.kicad_pcb **
-** Created on 2026-10-02T08:07:58+0200 **
+** Created on 2026-10-02T21:05:51+0200 **
+** Report includes: Errores, Avisos **
 
 ** Found 0 DRC violations **
 

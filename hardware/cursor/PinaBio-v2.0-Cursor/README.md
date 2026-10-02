@@ -1,4 +1,6 @@
-![PCB PinaBio Paca v2.0, cara superior](pcb-top.png)
+![PCB actualizada PinaBio Paca v.2.0. — versión ChatGPT](../../PinaBio-v2.0-ChatGPT/PinaBio-v2.0-ChatGPT-top.png)
+
+> La imagen anterior muestra la versión ChatGPT derivada de este diseño. El proyecto Cursor conservado en esta carpeta mantiene su propia PCB y sus archivos de fabricación originales.
 
 # PinaBio v.2.0. Cursor
 

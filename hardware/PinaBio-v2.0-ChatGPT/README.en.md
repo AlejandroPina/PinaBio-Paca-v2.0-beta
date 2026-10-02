@@ -1,54 +1,42 @@
-# PinaBio v2.0 ChatGPT — KiCad 9 project
+![PinaBio Paca v.2.0. PCB top view](PinaBio-v2.0-ChatGPT-top.png)
 
-[Español](README.md) · [Hardware specification](../../docs/en/specification.md) · [Power and USB](../../docs/en/power-usb.md)
+# PinaBio Paca v.2.0. — ChatGPT board
 
-**Status: engineering prototype for review. Do not release for manufacture or connect a person until the pending checks are complete.** The schematic, PCB and BOM are editable KiCad 9.0.6 files. Revision H1 uses **four layers and measures 96 × 96 mm**: signals and local copper on the outer faces, continuous ground on In1 and `3V3_SYS` distribution on In2. The existing outer ground and power pours remain. Both TPS63070–inductor switch connections remain on the component side without vias.
+[Español](README.md) · [Full specification](../../docs/en/specification.md) · [Power and USB](../../docs/en/power-usb.md)
 
-H1 deliberately keeps a **continuous inner ground plane**, whereas `SPEC-0.9` and Cursor use a split ground. The ADC digital bus and other signals cross between the digital and analogue areas; a continuous return plane avoids routing their return current around a ground slot. This is a layout proposal to compare and measure, not a proven performance claim. The board is larger than Cursor's; only an actual JLCPCB quotation can settle the cost difference.
+Editable **KiCad 9.0.9** project, four layers, **84.50 × 53.11 mm**. Derived from the Cursor implementation while retaining its fixed architecture: one soldered USB-C, physical-switch-controlled BQ24074 standby, no VBUS cut-off MOSFET, two regulators, no automatic sensor disconnects or new I²C pull-ups, two ground regions joined only at NT1, and a copper keepout on all layers beneath the ESP32 U.FL end. The TPS63070 and inductor keep SW_L1 and SW_L2 entirely on F.Cu at 0.40 mm with no vias; the RNM footprint retains pin 1 at top left and counterclockwise numbering.
 
-## Files
+## Files and checks
 
-- [`PinaBio-v2.0-ChatGPT.kicad_pro`](PinaBio-v2.0-ChatGPT.kicad_pro): project.
-- [`PinaBio-v2.0-ChatGPT.kicad_sch`](PinaBio-v2.0-ChatGPT.kicad_sch): schematic.
-- [`PinaBio-v2.0-ChatGPT.kicad_pcb`](PinaBio-v2.0-ChatGPT.kicad_pcb): routed PCB.
-- [`PinaBio-v2.0-ChatGPT-BOM.csv`](PinaBio-v2.0-ChatGPT-BOM.csv): per-reference BOM; [grouped BOM](PinaBio-v2.0-ChatGPT-BOM-grouped.csv): 93 placements and 54 groups. **This is not a JLCPCB purchasing BOM**: LCSC numbers and specific manufacturers for generic parts remain to be selected.
-- [`PinaBio-v2.0-ChatGPT-PinNets.csv`](PinaBio-v2.0-ChatGPT-PinNets.csv): numbered schematic pin connections.
-- [`ERC-H1.txt`](ERC-H1.txt), [`DRC-H1.txt`](DRC-H1.txt), the [schematic PDF](preview/PinaBio-v2.0-ChatGPT.pdf) and the [H1 front view](preview/pcb-front-H1.pdf) for review.
-- Local symbols, footprints and the ESP32 3D model are included; see [library licences](LIBRARY-LICENSE.md).
+- `PinaBio-v2.0-ChatGPT.kicad_sch`, `.kicad_pcb`, `.kicad_pro`: editable schematic and PCB.
+- `PinaCursor.kicad_sym`, `lib.pretty/`, `sym-lib-table`, `fp-lib-table`: required libraries.
+- `bom.csv`: parts list with manufacturer part numbers. L1 is **Coilcraft XAL4020-152MEC**.
+- `fab/`: four-layer copper, mask, paste, silkscreen and outline Gerbers; separate PTH/NPTH drill files; `position.csv` in millimetres. `PinaBio-v2.0-ChatGPT-Gerbers.zip` bundles the 14 board and drill files for fabrication upload; BOM and placement are separate.
+- `final-erc.txt`, `final-parity.txt`: **ERC 0, DRC 0, 0 unrouted connections and schematic/PCB parity 0**, checked with KiCad 9.0.9.
+- `Logo PINA-reducido.jfif`: source image converted to one-colour board silkscreen.
 
-## Circuits and connectors
+These Gerbers are **prototype outputs**. Before fabrication or assembly, independently check footprints against purchased parts and test one assembled unit, particularly USB-C and TPS63070 orientation, ON/OFF/USB transitions and external-module wiring.
 
-| Reference | Planned connection |
-| --- | --- |
-| J1 | USB-C 2.0 for data and charging, two 5.1 kΩ CC resistors, ESD and TVS protection. |
-| J2 | Protected 1S LiPo with 10 kΩ NTC: 1 `BAT_PROT`, 2 `GND`, 3 `BAT_NTC`. Check the actual cable polarity. |
-| SW1 | Physical DPDT switch. OFF+USB enables charging/programming; ON+USB sets BQ24074 standby, stops charging and permits battery-powered USB data. |
-| J3 | External AD8232: 1 `3V3_A`, 2 `GND`, 3 `OUTPUT`, 4 `LO+`, 5 `LO−`, 6 `SDN`. Electrode jack is on the module. |
-| J4/J5/J6 | Two-wire GSR/thorax/abdomen connections. Pin 1 is driven through 100 kΩ; pin 2 is ground. The sense node enters MCP6004 through another 100 kΩ. |
-| J7 | MAX30102 breakout: 1 VIN `3V3_SYS`, 2 GND, 3 SCL, 4 SDA, 5 INT. |
-| J8 | MAX30205 breakout: 1 VCC `3V0_TEMP`, 2 GND, 3 SDA, 4 SCL, 5 OS, 6 A0, 7 A1, 8 A2; address pins are grounded. **Contact count and order are provisional pending inspection of the actual breakout.** |
-| J9 | UART debug: 1 GND, 2 `3V3_SYS`, 3 TX, 4 RX; never use as a power input. |
+## Connector map
 
-TPS63070 uses 49.9 kΩ/16.0 kΩ, 0.1 %, for a nominal 3.295 V set point. TLV75530PDBVR supplies 3.0 V to J8 only. AD8232 output passes through a 33.2 kΩ/47.5 kΩ divider into its dedicated ADS122C04. The other ADS122C04 uses three single-ended inputs for GSR and both respiration bands; its fourth input is tied to the 0.5 V excitation and is not a free AUX channel. PGA bypass, sampling and I²C addressing are described in the [specification](../../docs/en/specification.md).
+| Ref | Pins in order |
+|---|---|
+| J1 | HCTL HC-TYPE-C-16P-01A USB-C at lower edge; D+ and D− via USBLC6-2SC6 and 22 Ω series resistors. |
+| J2 BATTERY | 1 protected BAT+, 2 GND, 3 TS/NTC. Three-pin JST PH. |
+| J3 ECG | 1 AGND, 2 3V3_A, 3 ECG_OUT, 4 LO_N, 5 LO_P, 6 3V3_A (SDN permanently enabled). Matches the red module order GND, 3.3V, OUTPUT, LO−, LO+, SDN. |
+| J4 PPG | 1 3V3_SYS/VIN, 2 GND, 3 SCL, 4 SDA, 5 INT. The “+” next to pin 1 denotes 3.3 V. |
+| J5 TEMP | 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. Four-pin JST PH; tie A0/A1/A2 to GND on the CJMCU-30205 module. |
+| J6 GSR | 1 GSR signal, 2 AGND. |
+| J7 RESP T | 1 chest signal, 2 AGND. |
+| J8 RESP A | 1 abdominal signal, 2 AGND. |
+| J9 BATT METER | 1 switched BAT+, 2 GND. JST PH B2B-PH-K-S(LF)(SN), for a meter drawing only tens of mA. |
 
-Sensor connectors remain continuously wired to their front ends: **there are no relays, MOSFETs or switches to disconnect sensors**. When a person is connected, USB may be used only through a host-powered external isolator. No person may be connected during OFF+USB charging/programming. This PCB contains no galvanic isolation.
+J9 is live only while **3V3_SYS** is active (ON with battery, or OFF with USB). Q4 BSS84 and Q5 BSS138 form the high-side switch; Q4 has 1 MΩ gate-to-source. J9 is not a general power output.
 
-## Checks completed
+## Switch and power
 
-- KiCad 9 ERC: **0 violations**.
-- KiCad 9 DRC: **0 violations and 0 unconnected items**.
-- Comparison of 329 connected schematic pins with PCB pad nets: **0 differences**.
-- Both TPS63070–inductor traces are approximately 4.7 mm, with no via. Thirteen `BAT_PROT`, `VBUS_RAW` and `SYS` segments were widened where DRC allowed; tight sections by pins and vias retain their original widths. Two local return vias were added near the ESP32 and ADCs. Voltage drop still requires measurement under real load.
-- The inner layers contain no signal tracks. In1 ground remains continuous and In2 distributes 3.3 V.
+SW1 is **six cable holes**, not a footprint for soldering the switch. The reference panel part is C&K **7201SYZQE**, DPDT ON-ON. Another six-terminal DPDT ON-ON part, such as an MTS-202, may be used after checking its common terminals and contact states with a meter. Hole 1–6 numbering follows C&K terminal 1–6: 1 VLOG, 2 EN2_CE, 3 GND, 4 BAT_PROT, 5 TPS_EN, 6 VLOG.
 
-These checks do not validate component choice, current, temperature, analogue noise, EMC or use on a person.
+R39, **10 kΩ, 1 %**, sits close to TPS63070 EN, between TPS_EN and TPS_EN_IC. R12, 100 kΩ, stays on the switch side. PS/SYNC is tied to ground for forced PWM. TLV75530PDBVR supplies **only** the temperature module at 3.0 V. VBUS link R3 remains **0 Ω**.
 
-## Gates before ordering from JLCPCB
-
-1. Check the **three actual breakout boards** for pin order, voltage limits, I²C pull-ups, peak current and connector orientation; revise J3/J7/J8 as needed. J8 is particularly provisional.
-2. Independently review the local `TPS63070_RNM0015A` footprint, all package orientations, drill sizes, BQ24074 thermal pad, U.FL connector area and the selected parts' JLCPCB assembly compatibility.
-3. Measure ESP32/PPG peak load, `3V3_SYS`, `3V0_TEMP`, startup and ON/OFF/USB transitions, no charging in ON+USB, temperatures and voltage drops. Validate the protected LiPo and cable.
-4. Measure ECG, GSR, respiration and 50/60 Hz pickup with actual modules and electrodes; test the external USB isolator in ON+USB mode.
-5. Select exact manufacturer and LCSC part numbers, check assembly, add fiducials, then generate Gerbers, drill files and placement files **after** the preceding checks are closed.
-
-ERC and DRC detect CAD errors but do not certify a body-connected circuit. Accordingly, this directory does not yet contain a released manufacturing Gerber package.
+With OFF and USB attached, the battery charges and the board may be programmed. With ON and USB attached, BQ24074 is in standby: the LiPo runs the board, USB carries data, and charging stops. A suitable external USB isolator is required before connecting a person in that state. The PCB has no onboard isolation or automatic sensor disconnect.

@@ -1,1 +1,4 @@
-(fp_lib_table (lib (name "PinaBio-ChatGPT")(type "KiCad")(uri "${KIPRJMOD}/PinaBio-ChatGPT.pretty")(options "")(descr "PinaBio custom footprints")))
+(fp_lib_table
+  (version 7)
+  (lib (name "PinaCursor")(type "KiCad")(uri "${KIPRJMOD}/lib.pretty")(options "")(descr "TPS63070 RNM"))
+)

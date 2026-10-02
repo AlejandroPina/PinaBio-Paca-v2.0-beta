@@ -2,7 +2,7 @@
 
 [Portada](../../README.md) · [Especificación V2](especificacion.md)
 
-V1 cuenta con placa, firmware y aplicación publicados; V2 sigue siendo una especificación. Las mejoras son objetivos de diseño, no prestaciones demostradas.
+V1 cuenta con placa, firmware y aplicación publicados. V2 ya tiene esquemático y PCB de prototipo en KiCad 9.0.9 con ERC/DRC/paridad cero, pero todavía no hay una placa montada, firmware ni aplicación V2 verificados. Las mejoras son objetivos de diseño, no prestaciones demostradas.
 
 | Aspecto | V1 | V2 revisada | Condición |
 |---|---|---|---|
@@ -14,4 +14,4 @@ V1 cuenta con placa, firmware y aplicación publicados; V2 sigue siendo una espe
 | Conexiones al cuerpo | Conectores directos | Conectores directos; el aislamiento con USB durante adquisición es externo | No hay desconexión automática de sensores al conectar USB. |
 | Software | Firmware/app V1.1 | PROTO-0.4 nuevo, no implementado | Sin compatibilidad ni adaptador V1.1. |
 
-V2 aumenta control de potencia, temporización y separación de adquisición, pero todavía retrocede en madurez hasta completar esquemático, prototipo, firmware y ensayos.
+V2 aumenta control de potencia, temporización y separación de adquisición, pero todavía retrocede en madurez hasta montar y ensayar el prototipo y completar firmware y aplicación.

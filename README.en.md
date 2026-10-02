@@ -6,7 +6,7 @@
 
 An experimental board for ECG, optical pulse (PPG), skin conductance (GSR), two respiration bands and temperature, with BLE data transmission. It is intended for research and biofeedback, not medical use.
 
-The new **PinaBio Paca v.2.0.** board is in [hardware/PinaBio-v2.0-ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.en.md). It is an editable **KiCad 9.0.9** project with schematic, four-layer PCB, BOM, Gerbers, drill files and placement file. The outline is **84.50 × 53.11 mm**. KiCad 9.0.9 reports **ERC 0, DRC 0, 0 unrouted connections and 0 schematic/PCB parity issues**. These are prototype manufacturing outputs; an independent footprint review and electrical validation of the first assembled board are still required.
+The new **PINABio "Paca" v.2.0.** board is in [hardware/PinaBio-v2.0-ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.en.md). It is an editable **KiCad 9.0.9** project with schematic, four-layer PCB, BOM, Gerbers, drill files and placement file. The outline is **84.50 × 53.11 mm**. KiCad 9.0.9 reports **ERC 0, DRC 0, 0 unrouted connections and 0 schematic/PCB parity issues**. These are prototype manufacturing outputs; an independent footprint review and electrical validation of the first assembled board are still required.
 
 ## Architecture
 

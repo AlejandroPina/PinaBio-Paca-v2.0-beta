@@ -6,7 +6,7 @@
 
 Placa experimental para registrar ECG, pulso óptico (PPG), respuesta galvánica de la piel (GSR), dos bandas de respiración y temperatura, y transmitir los datos por BLE. El uso previsto es investigación y biofeedback; no es un dispositivo médico.
 
-La nueva placa **PinaBio Paca v.2.0.** se encuentra en [hardware/PinaBio-v2.0-ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.md). Es un proyecto editable de **KiCad 9.0.9**, con esquemático, PCB de cuatro capas, BOM, Gerbers, taladros y posiciones. Mide **84,50 × 53,11 mm**. KiCad 9.0.9 informa **ERC 0, DRC 0, 0 conexiones pendientes y 0 diferencias entre esquemático y PCB**. Los archivos de fabricación son una salida de prototipo; falta la inspección independiente de huellas y la validación eléctrica de la primera placa ensamblada.
+La nueva placa **PINABio "Paca" v.2.0.** se encuentra en [hardware/PinaBio-v2.0-ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.md). Es un proyecto editable de **KiCad 9.0.9**, con esquemático, PCB de cuatro capas, BOM, Gerbers, taladros y posiciones. Mide **84,50 × 53,11 mm**. KiCad 9.0.9 informa **ERC 0, DRC 0, 0 conexiones pendientes y 0 diferencias entre esquemático y PCB**. Los archivos de fabricación son una salida de prototipo; falta la inspección independiente de huellas y la validación eléctrica de la primera placa ensamblada.
 
 ## Qué lleva
 

@@ -1,6 +1,6 @@
 ![PCB PinaBio Paca v.2.0., cara superior](PinaBio-v2.0-ChatGPT-top.png)
 
-# PinaBio Paca v.2.0. — placa ChatGPT
+# PINABio "Paca" v.2.0. — placa ChatGPT
 
 [English](README.en.md) · [Especificación completa](../../docs/es/especificacion.md) · [Alimentación y USB](../../docs/es/alimentacion-usb.md)
 
@@ -22,9 +22,9 @@ Los Gerbers son **de prototipo**. Antes de fabricar o montar, otra persona debe 
 | Referencia | Conexión por orden de pin |
 |---|---|
 | J1 | USB-C HCTL HC-TYPE-C-16P-01A, boca en el borde inferior; D+ y D− pasan por USBLC6-2SC6 y resistencias de 22 Ω. |
-| J2 BATERIA | 1 BAT+ protegido, 2 GND, 3 TS/NTC. JST PH de 3 pines. |
+| J2 BATT | 1 BAT+ protegido, 2 GND, 3 TS/NTC. JST PH de 3 pines. La serigrafía usa «BATT» debajo del conector. |
 | J3 ECG | 1 AGND, 2 3V3_A, 3 ECG_OUT, 4 LO_N, 5 LO_P, 6 3V3_A (SDN permanentemente habilitado). Orden del módulo rojo: GND, 3.3V, OUTPUT, LO−, LO+, SDN. |
-| J4 PPG | 1 3V3_SYS/VIN, 2 GND, 3 SCL, 4 SDA, 5 INT. El símbolo «+» junto al primer pin significa 3,3 V. |
+| J4 PPG | 1 3V3_SYS/VIN, 2 GND, 3 SCL, 4 SDA, 5 INT. «VIN» identifica la alimentación del módulo; las otras cuatro señales están rotuladas junto a sus pines. |
 | J5 TEMP | 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. JST PH de 4 pines; unir A0/A1/A2 a GND en el módulo CJMCU-30205. |
 | J6 GSR | 1 señal GSR, 2 AGND. |
 | J7 RESP T | 1 señal torácica, 2 AGND. |

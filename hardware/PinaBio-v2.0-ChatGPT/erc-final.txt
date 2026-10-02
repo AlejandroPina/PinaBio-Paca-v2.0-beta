@@ -1,0 +1,6 @@
+Informe de ERC (2026-10-02T21:40:48+0200, codificación UTF8)
+Report includes: Errores, Avisos
+
+***** Hoja /
+
+**Mensajes ERC: 0. Errores0, Avisos 0

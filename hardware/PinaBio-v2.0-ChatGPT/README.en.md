@@ -1,6 +1,6 @@
 ![PinaBio Paca v.2.0. PCB top view](PinaBio-v2.0-ChatGPT-top.png)
 
-# PinaBio Paca v.2.0. — ChatGPT board
+# PINABio "Paca" v.2.0. — ChatGPT board
 
 [Español](README.md) · [Full specification](../../docs/en/specification.md) · [Power and USB](../../docs/en/power-usb.md)
 
@@ -22,9 +22,9 @@ These Gerbers are **prototype outputs**. Before fabrication or assembly, indepen
 | Ref | Pins in order |
 |---|---|
 | J1 | HCTL HC-TYPE-C-16P-01A USB-C at lower edge; D+ and D− via USBLC6-2SC6 and 22 Ω series resistors. |
-| J2 BATTERY | 1 protected BAT+, 2 GND, 3 TS/NTC. Three-pin JST PH. |
+| J2 BATT | 1 protected BAT+, 2 GND, 3 TS/NTC. Three-pin JST PH. The silkscreen says “BATT” below the connector. |
 | J3 ECG | 1 AGND, 2 3V3_A, 3 ECG_OUT, 4 LO_N, 5 LO_P, 6 3V3_A (SDN permanently enabled). Matches the red module order GND, 3.3V, OUTPUT, LO−, LO+, SDN. |
-| J4 PPG | 1 3V3_SYS/VIN, 2 GND, 3 SCL, 4 SDA, 5 INT. The “+” next to pin 1 denotes 3.3 V. |
+| J4 PPG | 1 3V3_SYS/VIN, 2 GND, 3 SCL, 4 SDA, 5 INT. “VIN” identifies module power; the other four signals are labelled by their pins. |
 | J5 TEMP | 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. Four-pin JST PH; tie A0/A1/A2 to GND on the CJMCU-30205 module. |
 | J6 GSR | 1 GSR signal, 2 AGND. |
 | J7 RESP T | 1 chest signal, 2 AGND. |

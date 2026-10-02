@@ -1,5 +1,7 @@
 # PinaBio v.2.0. Cursor
 
+![PCB PinaBio Paca v2.0, cara superior](pcb-top.png)
+
 Diseño de competición en KiCad 9.0.9, solo con lo que queda escrito en SPEC-0.9 / PWR-0.7. Los sensores van a sus conectores sin relé, MOSFET ni conmutador en serie. El aislador USB es externo, en el cable. El BQ24074 entra en standby con el interruptor (EN1, EN2 y CE); no hay MOSFET de corte de VBUS.
 
 Placa 80,99 × 56,90 mm, cuatro capas. F.Cu e In1.Cu parten la masa en dos zonas: digital (ESP32, USB, BQ24074, TPS63070) y analógica (ADS122C04, MCP6004, divisor de ECG, GSR y bandas). Se unen en un solo sitio, corto y ancho, en NT1, junto a los ADS y a R15 (0 Ω entre 3V3_SYS y 3V3_A). In2.Cu es 3V3_SYS y no lleva señales de datos. B.Cu lleva las señales. Las señales analógicas no cruzan la masa digital.

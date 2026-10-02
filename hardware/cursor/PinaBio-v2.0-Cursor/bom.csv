@@ -14,9 +14,9 @@ Reference,Value,Footprint,Manufacturer,MPN,Voltage,Dielectric,Datasheet,Qty
 "R9 R10 R11 R12 R19 R20 R21 R30 R31 R32","100k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-07100KL","","","~",10
 "C1","4.7uF","Capacitor_SMD:C_0603_1608Metric","Samsung Electro-Mechanics","CL10A475KO8NNNC","16V","X5R","~",1
 "C2 C3 C4 C5 C6 C10 C16","10uF","Capacitor_SMD:C_0805_2012Metric","Samsung Electro-Mechanics","CL21A106KOQNNNE","16V","X5R","~",7
-"SW1","SW_DPDT","Button_Switch_SMD:SW_DPDT_CK_JS202011JCQN","C&K","JS202011JCQN","","","https://www.ckswitches.com/media/1428/js.pdf",1
+"SW1","DPDT caja","PinaCursor:SW_ext_6pad","","","","","https://media.digikey.com/pdf/Data%20Sheets/C&K/7000%20Mini%20Toggle%20Series.pdf",1
 "U3","TPS63070","PinaCursor:TPS63070RNM","Texas Instruments","TPS63070RNMR","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
-"L1","1.5uH","Inductor_SMD:L_Coilcraft_XAL4020-XXX","","","","","https://www.coilcraft.com/en-us/products/power/shielded-inductors/xfl/xfl4020/",1
+"L1","1.5uH","Inductor_SMD:L_Coilcraft_XAL4020-XXX","Coilcraft","XAL4020-152ME","","","https://www.coilcraft.com/getmedia/6adcb47d-8b55-416c-976e-1e22e0d2848c/xal4000.pdf",1
 "C7 C8 C9","22uF","Capacitor_SMD:C_0805_2012Metric","Samsung Electro-Mechanics","CL21A226MAYNNNE","25V","X5R","~",3
 "C11 C14 C17 C18 C19 C20 C21 C22","100nF","Capacitor_SMD:C_0603_1608Metric","Samsung Electro-Mechanics","CL10B104KB8NNNC","50V","X7R","~",8
 "R13","49.9k 0.1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RT0603BRD0749K9L","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1

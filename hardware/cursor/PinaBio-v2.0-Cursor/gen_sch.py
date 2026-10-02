@@ -276,7 +276,6 @@ def fill_meta():
     stamp(["U1"], "STMicroelectronics", "USBLC6-2SC6")
     stamp(["D1"], "Nexperia", "BZX84-C3V6,215")
     stamp(["U2"], "Texas Instruments", "BQ24074RGTR")
-    stamp(["SW1"], "C&K", "JS202011JCQN")
     stamp(["U3"], "Texas Instruments", "TPS63070RNMR")
     stamp(["U4"], "Texas Instruments", "TLV75530PDBVR")
     stamp(["Q1"], "onsemi", "BSS84LT1G")
@@ -290,7 +289,7 @@ def fill_meta():
     stamp(["J4"], "JST", "B5B-PH-K-S(LF)(SN)")
     stamp(["J5"], "JST", "B4B-PH-K-S(LF)(SN)")
     stamp(["J6", "J7", "J8"], "JST", "B2B-PH-K-S(LF)(SN)")
-    # L1 stays blank: the land is XAL4020 and the datasheet link is the XFL4020 family.
+    stamp(["L1"], "Coilcraft", "XAL4020-152ME")
 
 def place(lib, ref, value, fp, ds, unit, assign):
     pins = pins_of(LIBS[lib]["units"], unit)
@@ -447,13 +446,14 @@ def build_places():
     C("C1", "4.7uF", "VBUS_RAW", "GND")
     C("C2", "10uF", "SYS", "GND", C0805)
     C("C3", "10uF", "BAT_PROT", "GND", C0805)
-    # DPDT: pin 2 and pin 5 are the commons (B). Throw A is ON.
+    # Six holes for the enclosure DPDT. Commons are pads 2 and 5.
+    # ON closes 1-2 and 4-5. OFF closes 2-3 and 5-6. No onboard MPN.
     place(
         "SW",
         "SW1",
-        "SW_DPDT",
-        "Button_Switch_SMD:SW_DPDT_CK_JS202011JCQN",
-        "https://www.ckswitches.com/media/1428/js.pdf",
+        "DPDT caja",
+        "PinaCursor:SW_ext_6pad",
+        "https://media.digikey.com/pdf/Data%20Sheets/C&K/7000%20Mini%20Toggle%20Series.pdf",
         1,
         {"1": "VLOG", "2": "EN2_CE", "3": "GND", "4": "BAT_PROT", "5": "TPS_EN", "6": "VLOG"},
     )
@@ -490,7 +490,7 @@ def build_places():
         "L1",
         "1.5uH",
         "Inductor_SMD:L_Coilcraft_XAL4020-XXX",
-        "https://www.coilcraft.com/en-us/products/power/shielded-inductors/xfl/xfl4020/",
+        "https://www.coilcraft.com/getmedia/6adcb47d-8b55-416c-976e-1e22e0d2848c/xal4000.pdf",
         1,
         {"1": "SW_L1", "2": "SW_L2"},
     )
@@ -802,7 +802,7 @@ def emit():
     bodies = "\n".join(LIBS[k]["body"] for k in LIBS)
     note = (
         "PinaBio v.2.0. Cursor. SPEC-0.9. Sensores sin corte en serie. "
-        "Interruptor: throw A (pines 1 y 4) es ON. "
+        "Interruptor de caja C&K 7201SYZQE, DPDT ON-ON, cable 1:1. ""ON (lejos de la chaveta) cierra 2-1 y 5-4: EN2_CE a VLOG y TPS_EN a BAT_PROT. ""OFF (hacia la chaveta) cierra 2-3 y 5-6: EN2_CE a GND y TPS_EN a VLOG. ""Comunes en terminales 2 y 5. L1 es Coilcraft XAL4020-152ME, 1,5 uH. "
         "GPIO4=SDA y GPIO5=SCL del bus ADC; GPIO8=SDA y GPIO9=SCL de los modulos. "
         "J5 (J_TEMP) lleva 4 pines: 3V0_TEMP, GND, SDA_MOD, SCL_MOD. A0, A1 y A2 del CJMCU-30205 van a GND en el modulo y OS queda sin conectar. "
         "GPIO0 tiene 10 kΩ a 3V3_SYS. D+/D− llevan 22 Ω entre USBLC6-2SC6 y el ESP32. "

@@ -1,8 +1,8 @@
-QUE QUEDA. No hay nada en marcha.
+![PCB PinaBio Paca v2.0, cara superior](hardware/cursor/PinaBio-v2.0-Cursor/pcb-top.png)
 
-1. El interruptor. Esta bien conectado, pero la placa no dice que lado es ON. Hay que mirar la pieza real.
-2. La bobina de 1,5 uH. El BOM no tiene su codigo de fabricante: la huella y la hoja de datos no coinciden, y no he inventado un codigo.
-3. Antes de fabricar, mirar a ojo el trazado alrededor del TPS63070, sobre todo la masa de debajo.
+1. El interruptor de la caja es un C&K 7201SYZQE (DPDT ON-ON). La placa deja seis taladros, con ON junto a 1 y 4 y OFF junto a 3 y 6. El cable va de cada taladro al terminal del mismo número.
+2. La bobina de 1,5 µH es Coilcraft XAL4020-152ME. El patrón de tierra de la hoja coincide con la huella XAL4020.
+3. La masa alrededor del TPS63070 está revisada: las vías de GND y PGND están bien y esa zona no se ha movido.
 
 En el modulo de temperatura, unir A0, A1 y A2 a masa. El mazo del ECG cruza alimentacion con masa, y LO+ con LO-. El del pulso y el de temperatura pueden ir rectos. Eso ya esta escrito en la carpeta de la placa.
 

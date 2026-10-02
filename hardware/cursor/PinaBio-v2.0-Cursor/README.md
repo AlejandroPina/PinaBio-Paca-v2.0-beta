@@ -1,7 +1,6 @@
-# PinaBio v.2.0. Cursor
-
 ![PCB PinaBio Paca v2.0, cara superior](pcb-top.png)
 
+# PinaBio v.2.0. Cursor
 
 Diseño de competición en KiCad 9.0.9, solo con lo que queda escrito en SPEC-0.9 / PWR-0.7. Los sensores van a sus conectores sin relé, MOSFET ni conmutador en serie. El aislador USB es externo, en el cable. El BQ24074 entra en standby con el interruptor (EN1, EN2 y CE); no hay MOSFET de corte de VBUS.
 
@@ -35,7 +34,7 @@ El DRC incluye errores y avisos. No queda ninguno. `kicad-cli pcb drc --schemati
 - `lib.pretty/GndTie_2mm.kicad_mod`: el único puente entre GND y AGND. Cobre corto y ancho en F.Cu y en In1.Cu, con dos taladros. No entra en el BOM ni en el fichero de posición.
 - Símbolo `ADS122C04` en `PinaCursor.kicad_sym`: patillaje TSSOP-16 PW de SBAS751B, figura 69. Huella oficial `Package_SO:TSSOP-16_4.4x5mm_P0.65mm`.
 
-El resto sale de las bibliotecas de KiCad 9. TLV75530, MCP6004, BSS138, BSS84 y USBLC6-2SC6 son alias del símbolo padre de la biblioteca. Los conectores de sensor y de batería son JST PH de la serie B. J5 (J_TEMP, módulo externo CJMCU-30205) es un JST PH de 4 pines, `JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical`: 3V0_TEMP, GND, SDA_MOD, SCL_MOD. A0, A1 y A2 del módulo se unen a GND en el propio módulo (estaño o hilo corto) y la dirección I²C sigue siendo 0x48. OS del módulo queda sin conectar (el módulo lleva su pull-up de 10 kΩ): no hay red OS, ni punto de prueba, ni GPIO. La bobina de 1,5 µH usa la huella `L_Coilcraft_XAL4020`, de la misma clase que el XFL4020.
+El resto sale de las bibliotecas de KiCad 9. TLV75530, MCP6004, BSS138, BSS84 y USBLC6-2SC6 son alias del símbolo padre de la biblioteca. Los conectores de sensor y de batería son JST PH de la serie B. J5 (J_TEMP, módulo externo CJMCU-30205) es un JST PH de 4 pines, `JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical`: 3V0_TEMP, GND, SDA_MOD, SCL_MOD. A0, A1 y A2 del módulo se unen a GND en el propio módulo (estaño o hilo corto) y la dirección I²C sigue siendo 0x48. OS del módulo queda sin conectar (el módulo lleva su pull-up de 10 kΩ): no hay red OS, ni punto de prueba, ni GPIO. La bobina de 1,5 µH es Coilcraft XAL4020-152ME, huella `Inductor_SMD:L_Coilcraft_XAL4020-XXX`. El patrón de la hoja XAL4000 (documento 806) mide 2,37 mm entre centros de pad y pads de 0,98 × 3,4 mm, igual que esa huella. No es un XFL4020.
 
 ## Reglas de la placa
 
@@ -52,11 +51,24 @@ Estos valores no están en la spec; no son corrientes de módulo:
 - Los 100 nF de desacoplo del op-amp y de los buses.
 - R3 es 0 Ω en serie con VBUS: la spec no da el valor de un fusible, y este puente no abre VBUS.
 - R15 es 0 Ω entre 3V3_SYS y 3V3_A. Es el mismo buck, no un segundo regulador. Está al lado de NT1.
-- GPIO4 = SDA y GPIO5 = SCL del bus de los ADS. GPIO8 = SDA y GPIO9 = SCL de los módulos. El throw A del interruptor (pines 1 y 4) es ON.
+- GPIO4 = SDA y GPIO5 = SCL del bus de los ADS. GPIO8 = SDA y GPIO9 = SCL de los módulos.
 
 `rework_tps63070.py` (con `rw_router.py`) parte de la placa anterior, cambia U3 por la huella corregida, recoloca L1, C11, R8, R13 y R14 y vuelve a rutear solo la zona del TPS63070. `gen_pcb.py` lleva las mismas posiciones de U3 y L1.
 
 `rework_j5_4pin.py` parte de la placa anterior (J5 de 8 pines con OS y TP1), cambia J5 por la huella de 4 pines, quita TP1, el cobre de OS y las etiquetas de serigrafía de los pines 5 a 8, centra el rótulo TEMP y rellena las zonas. El resto de la placa no se toca.
+
+`rework_sw_pads.py` quita el interruptor de la placa y deja seis taladros (`lib.pretty/SW_ext_6pad.kicad_mod`) en el mismo sitio. La pieza de la caja es un C&K 7201SYZQE: DPDT de dos posiciones estables (ON-ON), casquillo roscado y seis terminales de soldar. Hoja *7000 Series Miniature Toggle Switches*, https://media.digikey.com/pdf/Data%20Sheets/C&K/7000%20Mini%20Toggle%20Series.pdf (la figura DPDT nombra ese código). No es el JS202011JCQN. Los comunes son los terminales 2 y 5. ON, palanca lejos de la chaveta, cierra 2-1 y 5-4. OFF, palanca hacia la chaveta, cierra 2-3 y 5-6. El cable es 1:1:
+
+| Taladro | Red | Terminal del 7201SYZQE |
+| --- | --- | --- |
+| 1 | VLOG | 1, throw ON del polo A |
+| 2 | EN2_CE | 2, común del polo A |
+| 3 | GND | 3, throw OFF del polo A |
+| 4 | BAT_PROT | 4, throw ON del polo B |
+| 5 | TPS_EN | 5, común del polo B |
+| 6 | VLOG | 6, throw OFF del polo B |
+
+ON une EN2_CE con VLOG y TPS_EN con BAT_PROT. OFF une EN2_CE con GND y TPS_EN con VLOG. La serigrafía dice ON junto a los taladros 1 y 4, OFF junto a 3 y 6, y COM sobre la columna de los comunes. Los taladros no entran en el BOM con código de fabricante; el código es el de la pieza de caja. La zona del TPS63070 no se ha vuelto a rutear: SW_L1 y SW_L2 siguen en F.Cu a 0,40 mm, sin vía, y las vías de GND/PGND de U3 se quedan donde estaban.
 
 ## Mazos de los módulos
 

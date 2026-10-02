@@ -1,17 +1,10 @@
-MAZOS. La placa no se cambia.
+QUE QUEDA. No hay nada en marcha.
 
-PPG: la foto coincide. Orden VIN, GND, SCL, SDA, INT. El cable puede ir recto.
+1. El interruptor. Esta bien conectado, pero la placa no dice que lado es ON. Hay que mirar la pieza real.
+2. La bobina de 1,5 uH. El BOM no tiene su codigo de fabricante: la huella y la hoja de datos no coinciden, y no he inventado un codigo.
+3. Antes de fabricar, mirar a ojo el trazado alrededor del TPS63070, sobre todo la masa de debajo.
 
-ECG: el cable no va recto, y se deja asi porque cambiar el orden obligaria a rehacer pistas. Mazo, de la placa al modulo rojo:
-1 de la placa (3V3) al 3.3V del modulo.
-2 de la placa (masa) al GND del modulo.
-3 de la placa (salida) al OUTPUT del modulo.
-4 de la placa (LO+) al LO+ del modulo.
-5 de la placa (LO-) al LO- del modulo.
-6 de la placa (SDN) al SDN del modulo.
-O sea: se cruzan alimentacion con masa, y LO+ con LO-.
-
-Temperatura: los cuatro pines van rectos (3V0, GND, SDA, SCL). En el modulo, A0, A1 y A2 a masa. OS sin cable.
+En el modulo de temperatura, unir A0, A1 y A2 a masa. El mazo del ECG cruza alimentacion con masa, y LO+ con LO-. El del pulso y el de temperatura pueden ir rectos. Eso ya esta escrito en la carpeta de la placa.
 
 <p align="center"><img src="assets/pina-logo.jpg" alt="Logo de PINA — Protocolos e Innovación en Neurociencia Aplicada" width="640"></p>
 

@@ -771,16 +771,16 @@ def tables():
     rows = ["(sym_lib_table", "  (version 7)"]
     for name in libs:
         rows.append(
-            f'  (lib (name "{name}")(type "KiCad")(uri "/usr/share/kicad/symbols/{name}.kicad_sym")(options "")(descr ""))'
+            f'  (lib (name "{name}")(type "KiCad")(uri "${{KICAD9_SYMBOL_DIR}}/{name}.kicad_sym")(options "")(descr ""))'
         )
     rows.append(
-        f'  (lib (name "PinaCursor")(type "KiCad")(uri "{ROOT / "PinaCursor.kicad_sym"}")(options "")(descr "TPS63070 and ADS122C04"))'
+        f'  (lib (name "PinaCursor")(type "KiCad")(uri "${{KIPRJMOD}}/PinaCursor.kicad_sym")(options "")(descr "TPS63070 and ADS122C04"))'
     )
     rows.append(")")
     (ROOT / "sym-lib-table").write_text("\n".join(rows) + "\n")
     (ROOT / "fp-lib-table").write_text(
         "(fp_lib_table\n  (version 7)\n"
-        f'  (lib (name "PinaCursor")(type "KiCad")(uri "{ROOT / "lib.pretty"}")(options "")(descr "TPS63070 RNM"))\n'
+        f'  (lib (name "PinaCursor")(type "KiCad")(uri "${{KIPRJMOD}}/lib.pretty")(options "")(descr "TPS63070 RNM"))\n'
         ")\n"
     )
     (ROOT / "PinaBio-v2.0-Cursor.kicad_pro").write_text(

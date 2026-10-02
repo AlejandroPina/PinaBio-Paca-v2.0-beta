@@ -13,7 +13,7 @@ El módulo es un ESP32-S3-MINI-1U: no tiene antena impresa, tiene conector U.FL.
 | `erc.rpt` | 0 errores, 0 avisos |
 | `drc.rpt` | 0 errores, 0 avisos, 0 sin conectar |
 
-El DRC incluye errores y avisos. No queda ninguno. La paridad esquemático–PCB también está a cero.
+El DRC incluye errores y avisos. No queda ninguno. La paridad esquemático–PCB también está a cero. `fp-lib-table` y `sym-lib-table` usan `${KIPRJMOD}` y `${KICAD9_SYMBOL_DIR}`: el ERC da 0 en un clon limpio.
 
 `fab/` tiene los Gerber (cobre, máscara, pasta, serigrafía y contorno), los Excellon PTH y NPTH, los mapas de taladro y `position.csv` en milímetros.
 
@@ -22,13 +22,13 @@ El DRC incluye errores y avisos. No queda ninguno. La paridad esquemático–PCB
 - R35 y R36 son 22 Ω en serie con D− (GPIO19) y D+ (GPIO20), entre el USBLC6-2SC6 y el ESP32.
 - U1 es un USBLC6-2SC6. La huella sigue siendo SOT-23-6, no SOT-666.
 - R37 es 46,4 kΩ al 1 % de TMR (pin 14 del BQ24074) a masa. ITERM sigue en el pin 15.
-- SW_L1 y SW_L2 van enteros en F.Cu, a 0,40 mm, sin vía.
+- SW_L1 y SW_L2 van enteros en F.Cu, a 0,40 mm, sin vía. L1 está al este de U3 (U3 a 0°) y los dos nodos miden 2,30 y 2,43 mm de pista.
 - R38 es 10 kΩ de GPIO0 a 3V3_SYS. El pulsador de BOOT sigue llevando GPIO0 a masa.
 - C12 y C13, los 2,2 µF del TLV75530, son X7R 0805.
 
 ## Huellas que no están en la biblioteca oficial
 
-- `lib.pretty/TPS63070RNM.kicad_mod`: patrón de tierra del encapsulado RNM (VQFN-HR de 15 pines) según el dibujo 4222000/B de TI, en SLVSC58B. Pads de señal 0,25 × 0,60 mm; pines 9–11 (L2, PGND, L1) con el cobre de 1,25 mm de ese ejemplo. Sin thermal pad. El cheurón de serigrafía está fuera de la máscara, junto al pin 1.
+- `lib.pretty/TPS63070RNM.kicad_mod`: patrón de tierra del encapsulado RNM (VQFN-HR de 15 pines) según el dibujo 4222000/B de TI, en SLVSC58B, visto desde arriba: pin 1 arriba a la izquierda y numeración antihoraria (1–4 columna izquierda, 5–8 fila inferior, 9–11 columna derecha de abajo arriba, 12–15 fila superior de derecha a izquierda). Pads de señal 0,25 × 0,60 mm (columna izquierda en x = −1,175 mm); pines 7, 8, 12 y 13 de 0,35 × 0,70 mm; pines 9 (L2) y 11 (L1) de 1,45 × 0,35 mm y pin 10 (PGND) de 1,80 × 0,35 mm. Sin thermal pad. El cheurón de serigrafía está fuera de la máscara, junto al pin 1. Una versión anterior tenía la numeración en espejo y los pines 9–11 de 1,25 × 0,25 mm; está corregida (véase `rework_tps63070.py`).
 - `lib.pretty/GndTie_2mm.kicad_mod`: el único puente entre GND y AGND. Cobre corto y ancho en F.Cu y en In1.Cu, con dos taladros. No entra en el BOM ni en el fichero de posición.
 - Símbolo `ADS122C04` en `PinaCursor.kicad_sym`: patillaje TSSOP-16 PW de SBAS751B, figura 69. Huella oficial `Package_SO:TSSOP-16_4.4x5mm_P0.65mm`.
 
@@ -50,3 +50,5 @@ Estos valores no están en la spec; no son corrientes de módulo:
 - R3 es 0 Ω en serie con VBUS: la spec no da el valor de un fusible, y este puente no abre VBUS.
 - R15 es 0 Ω entre 3V3_SYS y 3V3_A. Es el mismo buck, no un segundo regulador. Está al lado de NT1.
 - GPIO4 = SDA y GPIO5 = SCL del bus de los ADS. GPIO8 = SDA y GPIO9 = SCL de los módulos. El throw A del interruptor (pines 1 y 4) es ON. OS del CJMCU-30205 va a J5 y a TP1; no tiene GPIO, y una red de un solo pin no pasa el ERC.
+
+`rework_tps63070.py` (con `rw_router.py`) parte de la placa anterior, cambia U3 por la huella corregida, recoloca L1, C11, R8, R13 y R14 y vuelve a rutear solo la zona del TPS63070. `gen_pcb.py` lleva las mismas posiciones de U3 y L1.

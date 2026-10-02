@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Place and route PinaBio v.2.0. Cursor. Four layers, split ground."""
+"""Place and route PinaBio "Paca" v2.0. Four layers, split ground.
+
+The committed board comes from this generator plus the silk-screen pass (labels, logo, name)
+and rework_tps63070.py, which swaps in the corrected TPS63070 footprint and re-routes that zone.
+"""
 import heapq
 import math
 import re
@@ -38,9 +42,9 @@ FIXED = {
     "J2": (4.0, 4.2, 0),
     "SW1": (16.5, 5.2, 0),
     "U2": (16.2, 12.2, 270),
-    "U3": (16.2, 23.2, 180),
-    # Pads face the switch pins so both nodes stay short on F.Cu.
-    "L1": (11.6, 23.2, 270),
+    "U3": (15.545, 22.995, 0),
+    # East of the buck, pads facing the switch pins: both nodes stay short, on F.Cu, no vias.
+    "L1": (19.8, 23.295, 270),
     # Antenna end of the MINI-1U is local -Y. Sit that end on the board edge.
     "U5": (38.0, 9.0, 0),
     "U1": (37.6, 27.3, 90),
@@ -461,7 +465,7 @@ def setup(board):
     nc.SetViaDiameter(VIA_D)
     nc.SetViaDrill(VIA_DRILL)
     tb = board.GetTitleBlock()
-    tb.SetTitle("PinaBio v.2.0. Cursor")
+    tb.SetTitle('PinaBio "Paca" v2.0')
     tb.SetRevision("SPEC-0.9")
     tb.SetDate("2026-10-01")
     tb.SetComment(0, "In1 masa partida. In2 3V3_SYS, sin senales.")
@@ -1543,12 +1547,14 @@ def maze_connect(world, sources, target, width, net):
     return True
 
 
-def stitch_zone_net(board, world, net_name):
+def stitch_zone_net(board, world, net_name, only_refs=None):
     """One via just outside every SMD pad of a plane net, plus a short track."""
     net = board.FindNet(net_name)
     made = 0
     missed = []
     for fp in board.GetFootprints():
+        if only_refs is not None and fp.GetReference() not in only_refs:
+            continue
         for pad in fp.Pads():
             if pad.GetNetname() != net_name:
                 continue
@@ -1603,7 +1609,7 @@ def copper_hits_pad(world, pad):
     return False
 
 
-def heal_pads(board, world, nets):
+def heal_pads(board, world, nets, only_refs=None):
     """Tie SMD pads the router left on the opposite layer from their track."""
     fixed = 0
     left = []
@@ -1619,6 +1625,8 @@ def heal_pads(board, world, nets):
             continue
         for pad in pads:
             if pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+                continue
+            if only_refs is not None and pad.GetParentFootprint().GetReference() not in only_refs:
                 continue
             if copper_hits_pad(world, pad):
                 continue
@@ -1914,7 +1922,7 @@ def main():
     board.Save(out)
     print("saved before fill")
     text = pcbnew.PCB_TEXT(board)
-    text.SetText("PinaBio v.2.0. Cursor")
+    text.SetText('PinaBio "Paca" v2.0')
     text.SetLayer(pcbnew.F_SilkS)
     text.SetPosition(pcbnew.VECTOR2I(int(outline[0] + nm(42)), int(outline[3] - nm(1.77))))
     text.SetTextSize(pcbnew.VECTOR2I(nm(0.9), nm(0.9)))

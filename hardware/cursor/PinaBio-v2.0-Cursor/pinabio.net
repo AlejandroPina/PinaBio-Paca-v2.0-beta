@@ -1,7 +1,7 @@
 (export (version "E")
   (design
-    (source "/tmp/pinabio-paca/hardware/cursor/PinaBio-v2.0-Cursor/PinaBio-v2.0-Cursor.kicad_sch")
-    (date "2026-10-01T17:59:45+0000")
+    (source "PinaBio-v2.0-Cursor.kicad_sch")
+    (date "2026-10-02T09:37:53+0000")
     (tool "Eeschema 9.0.9-9.0.9~ubuntu24.04.1")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -1780,7 +1780,7 @@
     (library (logical "Diode")
       (uri "/usr/share/kicad/symbols/Diode.kicad_sym"))
     (library (logical "PinaCursor")
-      (uri "/tmp/pinabio-paca/hardware/cursor/PinaBio-v2.0-Cursor/PinaCursor.kicad_sym"))
+      (uri "${KIPRJMOD}/PinaCursor.kicad_sym"))
     (library (logical "Power_Protection")
       (uri "/usr/share/kicad/symbols/Power_Protection.kicad_sym"))
     (library (logical "RF_Module")

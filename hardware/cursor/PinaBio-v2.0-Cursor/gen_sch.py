@@ -238,6 +238,59 @@ def load_official():
 
 # placements filled in build()
 PLACES = []
+# Purchasable identity. Electrical value and footprint stay as they are.
+# Empty MPN means the exact orderable was not confirmed.
+META = {}
+
+def stamp(refs, mfr, mpn, voltage="", dielectric=""):
+    for ref in refs:
+        META[ref] = {"mfr": mfr, "mpn": mpn, "voltage": voltage, "dielectric": dielectric}
+
+def fill_meta():
+    y = "YAGEO"
+    sm = "Samsung Electro-Mechanics"
+    stamp(["R1", "R2"], y, "RC0603FR-075K1L")
+    stamp(["R35", "R36"], y, "RC0603FR-0722RL")
+    stamp(["R3", "R15"], y, "RC0603JR-070RL")
+    stamp(["R4", "R22", "R38", "R25", "R26", "R27", "R29"], y, "RC0603FR-0710KL")
+    stamp(["R5"], y, "RC0603FR-0715KL")
+    stamp(["R6", "R7"], y, "RC0603FR-072K94L")
+    stamp(["R37"], y, "RC0603FR-0746K4L")
+    stamp(["R8"], y, "RC0603FR-072K2L")
+    stamp(["R9", "R10", "R11", "R12", "R19", "R20", "R21", "R30", "R31", "R32"], y, "RC0603FR-07100KL")
+    stamp(["R13"], y, "RT0603BRD0749K9L")
+    stamp(["R14"], y, "RT0603BRD0716KL")
+    stamp(["R16", "R17"], y, "RC0603FR-071ML")
+    stamp(["R18"], y, "RC0603FR-07330KL")
+    stamp(["R23", "R24"], y, "RC0603FR-074K7L")
+    stamp(["R28"], y, "RC0603FR-0756KL")
+    stamp(["R33"], y, "RC0603FR-0733K2L")
+    stamp(["R34"], y, "RC0603FR-0747K5L")
+    stamp(["C1"], sm, "CL10A475KO8NNNC", "16V", "X5R")
+    stamp(["C2", "C3", "C4", "C5", "C6", "C10", "C16"], sm, "CL21A106KOQNNNE", "16V", "X5R")
+    stamp(["C7", "C8", "C9"], sm, "CL21A226MAYNNNE", "25V", "X5R")
+    stamp(["C11", "C14", "C17", "C18", "C19", "C20", "C21", "C22"], sm, "CL10B104KB8NNNC", "50V", "X7R")
+    stamp(["C12", "C13"], sm, "CL21B225KAFNNNE", "25V", "X7R")
+    stamp(["C15"], sm, "CL10A105KB8NNNC", "50V", "X5R")
+    stamp(["J1"], "HCTL", "HC-TYPE-C-16P-01A")
+    stamp(["U1"], "STMicroelectronics", "USBLC6-2SC6")
+    stamp(["D1"], "Nexperia", "BZX84-C3V6,215")
+    stamp(["U2"], "Texas Instruments", "BQ24074RGTR")
+    stamp(["SW1"], "C&K", "JS202011JCQN")
+    stamp(["U3"], "Texas Instruments", "TPS63070RNMR")
+    stamp(["U4"], "Texas Instruments", "TLV75530PDBVR")
+    stamp(["Q1"], "onsemi", "BSS84LT1G")
+    stamp(["Q2", "Q3"], "onsemi", "BSS138LT1G")
+    stamp(["J2"], "JST", "B3B-PH-K-S(LF)(SN)")
+    stamp(["U5"], "Espressif", "ESP32-S3-MINI-1U-N8")
+    stamp(["SW2"], "Omron", "B3U-1000P")
+    stamp(["U6", "U7"], "Texas Instruments", "ADS122C04IPWR")
+    stamp(["U8"], "Microchip", "MCP6004-I/SL")
+    stamp(["J3"], "JST", "B6B-PH-K-S(LF)(SN)")
+    stamp(["J4"], "JST", "B5B-PH-K-S(LF)(SN)")
+    stamp(["J5"], "JST", "B4B-PH-K-S(LF)(SN)")
+    stamp(["J6", "J7", "J8"], "JST", "B2B-PH-K-S(LF)(SN)")
+    # L1 stays blank: the land is XAL4020 and the datasheet link is the XFL4020 family.
 
 def place(lib, ref, value, fp, ds, unit, assign):
     pins = pins_of(LIBS[lib]["units"], unit)
@@ -252,8 +305,22 @@ def place(lib, ref, value, fp, ds, unit, assign):
                 raise SystemExit(f"{ref} {lib} unit {unit} missing pin {p['num']} {p['name']}")
         else:
             nets[p["num"]] = assign[p["num"]]
+    extra = META.get(ref, {"mfr": "", "mpn": "", "voltage": "", "dielectric": ""})
     PLACES.append(
-        {"lib": lib, "ref": ref, "value": value, "fp": fp, "ds": ds, "unit": unit, "nets": nets, "pins": pins}
+        {
+            "lib": lib,
+            "ref": ref,
+            "value": value,
+            "fp": fp,
+            "ds": ds,
+            "unit": unit,
+            "nets": nets,
+            "pins": pins,
+            "mfr": extra["mfr"],
+            "mpn": extra["mpn"],
+            "voltage": extra["voltage"],
+            "dielectric": extra["dielectric"],
+        }
     )
 
 def by_name(lib, unit, mapping):
@@ -266,6 +333,7 @@ def by_name(lib, unit, mapping):
     return assign
 
 def build_places():
+    fill_meta()
     R0603 = "Resistor_SMD:R_0603_1608Metric"
     C0603 = "Capacitor_SMD:C_0603_1608Metric"
     C0805 = "Capacitor_SMD:C_0805_2012Metric"
@@ -666,6 +734,14 @@ def emit():
             lib_id = lib_ids[part["lib"]]
         else:
             lib_id = f"Connector_Generic:Conn_01x{int(part['lib'][1:]):02d}"
+        cap_props = ""
+        if part["lib"] == "C":
+            cap_props = (
+                f'(property "Voltage" "{part["voltage"]}" (at {fmt(sx)} {fmt(sy)} 0) '
+                f'(effects (font (size 1.27 1.27)) (hide yes)))\n'
+                f'(property "Dielectric" "{part["dielectric"]}" (at {fmt(sx)} {fmt(sy)} 0) '
+                f'(effects (font (size 1.27 1.27)) (hide yes)))\n'
+            )
         symbols.append(
             f'''(symbol (lib_id "{lib_id}") (at {fmt(sx)} {fmt(sy)} 0) (unit {part["unit"]})
 (exclude_from_sim no) (in_bom {"no" if part["ref"].startswith("#") or part["lib"] == "NT" else "yes"}) (on_board {"no" if part["ref"].startswith("#") else "yes"}) (dnp no)
@@ -674,7 +750,9 @@ def emit():
 (property "Value" "{part["value"]}" (at {fmt(sx)} {fmt(sy + D("2.54"))} 0) (effects (font (size 1.27 1.27))))
 (property "Footprint" "{part["fp"]}" (at {fmt(sx)} {fmt(sy)} 0) (effects (font (size 1.27 1.27)) (hide yes)))
 (property "Datasheet" "{part["ds"]}" (at {fmt(sx)} {fmt(sy)} 0) (effects (font (size 1.27 1.27)) (hide yes)))
-{pinxml}
+(property "Manufacturer" "{part["mfr"]}" (at {fmt(sx)} {fmt(sy)} 0) (effects (font (size 1.27 1.27)) (hide yes)))
+(property "MPN" "{part["mpn"]}" (at {fmt(sx)} {fmt(sy)} 0) (effects (font (size 1.27 1.27)) (hide yes)))
+{cap_props}{pinxml}
 (instances (project "PinaBio-v2.0-Cursor" (path "/{sheet}" (reference "{part["ref"]}") (unit {part["unit"]}))))
 )'''
         )
@@ -780,13 +858,17 @@ def tables():
         f'  (lib (name "PinaCursor")(type "KiCad")(uri "${{KIPRJMOD}}/lib.pretty")(options "")(descr "TPS63070 RNM"))\n'
         ")\n"
     )
-    (ROOT / "PinaBio-v2.0-Cursor.kicad_pro").write_text(
-        '{"meta":{"filename":"PinaBio-v2.0-Cursor.kicad_pro","version":1},"sheets":[]}\n'
-    )
+    pro = ROOT / "PinaBio-v2.0-Cursor.kicad_pro"
+    # The committed project holds the board rules (0.15 mm clearance, 0.25 mm via).
+    # A stub would make KiCad rewrite those rules to its defaults.
+    if not pro.exists():
+        pro.write_text(
+            '{"meta":{"filename":"PinaBio-v2.0-Cursor.kicad_pro","version":1},"sheets":[]}\n'
+        )
 
 def bom():
     seen = set()
-    lines = ["Reference,Value,Footprint,Datasheet,Qty"]
+    lines = ["Reference,Value,Footprint,Manufacturer,MPN,Voltage,Dielectric,Datasheet,Qty"]
     grouped = {}
     for p in PLACES:
         if p["ref"].startswith("#") or p["lib"] == "NT":
@@ -794,12 +876,14 @@ def bom():
         if p["ref"] in seen:
             continue
         seen.add(p["ref"])
-        key = (p["value"], p["fp"])
+        key = (p["value"], p["fp"], p["mfr"], p["mpn"], p["voltage"], p["dielectric"])
         grouped.setdefault(key, []).append(p)
-    for (value, fp), parts in grouped.items():
+    for (value, fp, mfr, mpn, voltage, dielectric), parts in grouped.items():
         refs = " ".join(p["ref"] for p in parts)
         ds = parts[0]["ds"]
-        lines.append(f'"{refs}","{value}","{fp}","{ds}",{len(parts)}')
+        lines.append(
+            f'"{refs}","{value}","{fp}","{mfr}","{mpn}","{voltage}","{dielectric}","{ds}",{len(parts)}'
+        )
     (ROOT / "bom.csv").write_text("\n".join(lines) + "\n")
     print("bom lines", len(lines) - 1)
 

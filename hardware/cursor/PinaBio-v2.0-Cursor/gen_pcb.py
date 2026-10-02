@@ -162,6 +162,9 @@ def load_fp(fpname):
     fp = pcbnew.FootprintLoad(path, name)
     if fp is None:
         raise SystemExit(f"missing footprint {fpname}")
+    # The .kicad_mod file has no library nickname. Schematic parity compares the
+    # full LIB:NAME string, so the nickname has to be written onto the footprint.
+    fp.SetFPID(pcbnew.LIB_ID(nick, name))
     return fp
 
 
@@ -426,8 +429,8 @@ def add_nets(board, nets):
 
 def assign_pads(fps, nets):
     for name, nodes in nets.items():
-        if name.startswith("unconnected-"):
-            continue
+        # unconnected-(REF-Pin-PadN) is a real schematic net. Leaving the pad
+        # on "no net" fails schematic parity and does not add copper.
         for ref, pin in nodes:
             hits = [p for p in fps[ref].Pads() if p.GetNumber() == pin]
             if not hits:

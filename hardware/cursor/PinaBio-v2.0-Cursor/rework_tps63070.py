@@ -84,6 +84,8 @@ def swap_u3(board):
         d.SetNet(nets[d.GetNumber()])
     for g in lib.GraphicalItems():
         old.Add(g.Duplicate())
+    # Keep the library nickname. The pad geometry above is the corrected RNM.
+    old.SetFPID(pcbnew.LIB_ID("PinaCursor", "TPS63070RNM"))
     old.SetLibDescription(lib.GetLibDescription())
     old.SetKeywords(lib.GetKeywords())
     old.SetPosition(V(*U3_POS))

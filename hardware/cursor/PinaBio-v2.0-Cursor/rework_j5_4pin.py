@@ -54,7 +54,8 @@ def swap_j5(board):
         d.SetNet(nets[d.GetNumber()])
     for g in lib.GraphicalItems():
         old.Add(g.Duplicate())
-    old.SetFPID(lib.GetFPID())
+    # FootprintLoad leaves the nickname off. Parity wants Connector_JST:NAME.
+    old.SetFPID(pcbnew.LIB_ID("Connector_JST", NAME))
     old.Models().clear()
     for m in lib.Models():
         old.Add3DModel(m)

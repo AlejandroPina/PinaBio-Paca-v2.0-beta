@@ -16,7 +16,7 @@ El módulo es un ESP32-S3-MINI-1U: no tiene antena impresa, tiene conector U.FL.
 | `erc.rpt` | 0 errores, 0 avisos |
 | `drc.rpt` | 0 errores, 0 avisos, 0 sin conectar |
 
-El DRC incluye errores y avisos. No queda ninguno. La paridad esquemático–PCB también está a cero. `fp-lib-table` y `sym-lib-table` usan `${KIPRJMOD}` y `${KICAD9_SYMBOL_DIR}`: el ERC da 0 en un clon limpio.
+El DRC incluye errores y avisos. No queda ninguno. `kicad-cli pcb drc --schematic-parity` queda en 0 avisos. `fp-lib-table` y `sym-lib-table` usan `${KIPRJMOD}` y `${KICAD9_SYMBOL_DIR}`: el ERC da 0 en un clon limpio.
 
 `fab/` tiene los Gerber (cobre, máscara, pasta, serigrafía y contorno), los Excellon PTH y NPTH, los mapas de taladro y `position.csv` en milímetros.
 

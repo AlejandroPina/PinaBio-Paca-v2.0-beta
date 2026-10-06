@@ -1,4 +1,0 @@
-80.99 x 56.90 mm
-layers 4 (F and In1 split GND/AGND, In2 3V3_SYS with no signals, B signals)
-antenna keepout on the U.FL end, all copper layers
-single GND/AGND tie next to the ADCs and the 0 ohm 3V3 bridge

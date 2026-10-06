@@ -1,0 +1,3 @@
+The project uses official KiCad symbols and footprints under the [KiCad library license](https://www.kicad.org/libraries/license/). The local `PinaBio.kicad_sym` and `lib.pretty/` contain project-specific ADS122C04/TPS63070 symbols and TPS63070, switch-hole and ground-tie footprints derived from the manufacturers' package and pinout drawings. Check those footprints against the purchased parts before assembly.
+
+The optional `3dmodels/ESP32-S3-MINI-1U.STEP` model was copied from the [Espressif KiCad libraries](https://github.com/espressif/kicad-libraries), licensed CC-BY-SA 4.0 with the electronics-design waiver in the upstream LICENSE.md.

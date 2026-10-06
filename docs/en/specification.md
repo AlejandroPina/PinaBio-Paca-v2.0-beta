@@ -46,7 +46,7 @@ The slow ADS initially samples GSR, thorax and abdomen at 20 SPS each. Report OP
 
 ## Board
 
-Four layers. The ChatGPT implementation is **84.50 × 53.11 mm**; the modest width increase provides room for J3 labels outside the connector. USB-C is at the lower edge with its mouth extending past the outline. The ESP32-S3-MINI-1U has no printed antenna: it has a U.FL connector. That end of the module sits at the upper board edge, as far out as it will go, so the external antenna is outside the copper. On every layer, under that end and a little past the module edge outward, there is no copper, no track, no via and no plane. USB and the buck do not sit under that zone.
+Four layers. The board is **84.50 × 53.11 mm**; the width leaves room for J3 labels outside the connector. USB-C is at the lower edge with its mouth extending past the outline. The ESP32-S3-MINI-1U has no printed antenna: it has a U.FL connector. That end of the module sits at the upper board edge, as far out as it will go, so the external antenna is outside the copper. On every layer, under that end and a little past the module edge outward, there is no copper, no track, no via and no plane. USB and the buck do not sit under that zone.
 
 There are two ground planes. Digital ground covers the ESP32, USB, the BQ24074 and the TPS63070. Analogue ground covers the ADS122C04 devices, the MCP6004, the ECG divider, GSR and the bands. They join in one place, short and wide, next to the ADCs and the 0 Ω link between `3V3_SYS` and `3V3_A`, so the supply and the return meet at the same point. There are no extra joins and no thin track crossing the board. Analogue signals do not cross digital ground. In1 is ground, split into those two zones. F.Cu carries the same split, stitched with vias to its own zone. In2 is `3V3_SYS` and carries no data signals. B.Cu carries the signals.
 
@@ -56,10 +56,10 @@ Both TPS63070 inductor nodes stay on F.Cu, with no via, at 0.40 mm for the whole
 
 Measure every breakout; test all four USB/switch states including no battery; prove ON+USB leaves OUT on BAT with zero charge current and VBUS/D+/D− cannot back-power ON-without-battery. Capture EN1, EN2 and CE during steady states and switch/USB transients to check their voltage limits. With OFF+USB, document voltage at the sensor connectors. Measure 3.3 V ripple and load, GSR fault current, ECG range/noise, external buses and USB-isolator behaviour. KiCad 9.0.9 schematic, PCB, BOM, Gerbers, drill and placement outputs exist with ERC, DRC and schematic/PCB parity at zero. Footprint checks, body-connected-path review and these bench results remain necessary before a production order.
 
-## ChatGPT implementation contract
+## Implementation contract
 
 - J3, external AD8232 module: pin 1 AGND/GND, 2 3V3_A/3.3V, 3 ECG_OUT/OUTPUT, 4 LO_N/LO−, 5 LO_P/LO+, 6 3V3_A/SDN. SDN remains enabled. This matches the red module order for a flat cable.
-- J5, CJMCU-30205: pin 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. J9 battery meter: JST PH B2B-PH-K-S(LF)(SN), pin 1 switched BAT+, pin 2 GND. A BSS84LT1G high-side device and BSS138LT1G enable it only while 3V3_SYS exists; 1 MΩ ties the BSS84 gate to its source. J9 is for meters drawing only tens of mA.
+- J5, CJMCU-30205: pin 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. J9 battery meter: JST PH B2B-PH-K-S(LF)(SN), pin 1 switched BAT+, pin 2 GND. A BSS84LT1G high-side device and BSS138LT1G enable it only while 3V3_SYS exists; 1 MΩ ties the BSS84 gate to its source. J9 is reserved for the battery meter.
 - R39, YAGEO RC0603FR-0710KL, 10 kΩ 1 %, is in series between TPS_EN and TPS63070 EN, close to the IC. The 100 kΩ R12 pulldown remains on the switch side. PS/SYNC stays grounded. R3 remains 0 Ω.
 - L1 is Coilcraft **XAL4020-152MEC**, 1.5 µH with the unchanged XAL4020 footprint; “C” denotes 7-inch reel packaging.
 - J3 silkscreen labels form one column outside and aligned with its six pins. The PINA logo remains at the upper right, with a smaller copy beside the two-line “PINABio \"Paca\" v.2.0.” board name at centre right. J2 is marked BATT; J4's VIN, GND, SCL, SDA and INT labels share one left alignment. Connector names and pin labels are at least 1.0 mm high with 0.15 mm stroke.

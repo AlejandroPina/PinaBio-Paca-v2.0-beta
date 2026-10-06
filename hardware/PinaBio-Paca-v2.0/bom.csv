@@ -1,0 +1,48 @@
+Reference,Value,Footprint,Manufacturer,MPN,Voltage,Dielectric,Datasheet,Qty
+"J1","USB-C","Connector_USB:USB_C_Receptacle_HCTL_HC-TYPE-C-16P-01A","HCTL","HC-TYPE-C-16P-01A","","","~",1
+"R1 R2","5.1k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-075K1L","","","~",2
+"U1","USBLC6-2SC6","Package_TO_SOT_SMD:SOT-23-6","STMicroelectronics","USBLC6-2SC6","","","https://www.st.com/resource/en/datasheet/usblc6-2.pdf",1
+"R35 R36","22","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0722RL","","","~",2
+"R3 R15","0","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603JR-070RL","","","~",2
+"R4","10.0k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0710KL","","","~",1
+"R5","15.0k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0715KL","","","~",1
+"D1","BZX84-C3V6","Package_TO_SOT_SMD:SOT-23","Nexperia","BZX84-C3V6,215","","","https://assets.nexperia.com/documents/data-sheet/BZX84_SERIES.pdf",1
+"U2","BQ24074","Package_DFN_QFN:VQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm","Texas Instruments","BQ24074RGTR","","","https://www.ti.com/lit/ds/symlink/bq24074.pdf",1
+"R6 R7","2.94k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-072K94L","","","https://www.ti.com/lit/ds/symlink/bq24074.pdf",2
+"R37","46.4k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0746K4L","","","https://www.ti.com/lit/ds/symlink/bq24074.pdf",1
+"R8","2.2k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-072K2L","","","~",1
+"R9 R10 R11 R12 R19 R20 R21 R30 R31 R32","100k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-07100KL","","","~",10
+"C1","4.7uF","Capacitor_SMD:C_0603_1608Metric","Samsung Electro-Mechanics","CL10A475KO8NNNC","16V","X5R","~",1
+"C2 C3 C4 C5 C6 C10 C16","10uF","Capacitor_SMD:C_0805_2012Metric","Samsung Electro-Mechanics","CL21A106KOQNNNE","16V","X5R","~",7
+"SW1","DPDT caja","PinaBio:SW_ext_6pad","","","","","https://media.digikey.com/pdf/Data%20Sheets/C&K/7000%20Mini%20Toggle%20Series.pdf",1
+"R39 R29","10k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0710KL","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",2
+"U3","TPS63070","PinaBio:TPS63070RNM","Texas Instruments","TPS63070RNMR","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"L1","1.5uH","Inductor_SMD:L_Coilcraft_XAL4020-XXX","Coilcraft","XAL4020-152MEC","","","https://www.coilcraft.com/getmedia/6adcb47d-8b55-416c-976e-1e22e0d2848c/xal4000.pdf",1
+"C7 C8 C9","22uF","Capacitor_SMD:C_0805_2012Metric","Samsung Electro-Mechanics","CL21A226MAYNNNE","25V","X5R","~",3
+"C11 C14 C17 C18 C19 C20 C21 C22","100nF","Capacitor_SMD:C_0603_1608Metric","Samsung Electro-Mechanics","CL10B104KB8NNNC","50V","X7R","~",8
+"R13","49.9k 0.1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RT0603BRD0749K9L","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"R14","16.0k 0.1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RT0603BRD0716KL","","","https://www.ti.com/lit/ds/symlink/tps63070.pdf",1
+"U4","TLV75530PDBVR","Package_TO_SOT_SMD:SOT-23-5","Texas Instruments","TLV75530PDBVR","","","https://www.ti.com/lit/ds/symlink/tlv755p.pdf",1
+"C12 C13","2.2uF","Capacitor_SMD:C_0805_2012Metric","Samsung Electro-Mechanics","CL21B225KAFNNNE","25V","X7R","~",2
+"Q1 Q4","BSS84","Package_TO_SOT_SMD:SOT-23","onsemi","BSS84LT1G","","","https://www.onsemi.com/pdf/datasheet/bss84-d.pdf",2
+"Q2 Q3 Q5","BSS138","Package_TO_SOT_SMD:SOT-23","onsemi","BSS138LT1G","","","https://www.onsemi.com/pdf/datasheet/bss138-d.pdf",3
+"R16 R17 R40","1M","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-071ML","","","~",3
+"R18","330k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-07330KL","","","~",1
+"J2","J_BATT","Connector_JST:JST_PH_B3B-PH-K_1x03_P2.00mm_Vertical","JST","B3B-PH-K-S(LF)(SN)","","","~",1
+"J9","J_BATT_METER","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","JST","B2B-PH-K-S(LF)(SN)","","","~",1
+"U5","ESP32-S3-MINI-1U-N8","RF_Module:ESP32-S2-MINI-1U","Espressif","ESP32-S3-MINI-1U-N8","","","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",1
+"R22 R38 R25 R26 R27","10k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0710KL","","","https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf",5
+"C15","1uF","Capacitor_SMD:C_0603_1608Metric","Samsung Electro-Mechanics","CL10A105KB8NNNC","50V","X5R","~",1
+"SW2","BOOT","Button_Switch_SMD:SW_SPST_B3U-1000P","Omron","B3U-1000P","","","~",1
+"R23 R24","4.7k","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-074K7L","","","~",2
+"U6 U7","ADS122C04","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","Texas Instruments","ADS122C04IPWR","","","https://www.ti.com/lit/ds/symlink/ads122c04.pdf",2
+"U8","MCP6004","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm","Microchip","MCP6004-I/SL","","","https://ww1.microchip.com/downloads/en/DeviceDoc/MCP6001-1R-1U-2-4-1-MHz-Low-Power-Op-Amp-DS20001733L.pdf",1
+"R28","56k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0756KL","","","~",1
+"R33","33.2k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0733K2L","","","~",1
+"R34","47.5k 1%","Resistor_SMD:R_0603_1608Metric","YAGEO","RC0603FR-0747K5L","","","~",1
+"J3","J_ECG","Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical","JST","B6B-PH-K-S(LF)(SN)","","","~",1
+"J4","J_PPG","Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical","JST","B5B-PH-K-S(LF)(SN)","","","~",1
+"J5","J_TEMP","Connector_JST:JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical","JST","B4B-PH-K-S(LF)(SN)","","","~",1
+"J6","J_GSR","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","JST","B2B-PH-K-S(LF)(SN)","","","~",1
+"J7","J_RESP_T","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","JST","B2B-PH-K-S(LF)(SN)","","","~",1
+"J8","J_RESP_A","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","JST","B2B-PH-K-S(LF)(SN)","","","~",1

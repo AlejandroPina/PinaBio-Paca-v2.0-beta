@@ -1,4 +1,4 @@
-![PinaBio Paca v.2.0., cara superior de la PCB ChatGPT](hardware/PinaBio-v2.0-ChatGPT/PinaBio-v2.0-ChatGPT-top.png)
+![PinaBio Paca v.2.0., cara superior de la PCB](hardware/PinaBio-Paca-v2.0/PinaBio-Paca-v2.0-top.png)
 
 # PinaBio Paca v2.0 beta
 
@@ -6,7 +6,7 @@
 
 Placa experimental para registrar ECG, pulso óptico (PPG), respuesta galvánica de la piel (GSR), dos bandas de respiración y temperatura, y transmitir los datos por BLE. El uso previsto es investigación y biofeedback; no es un dispositivo médico.
 
-La nueva placa **PINABio "Paca" v.2.0.** se encuentra en [hardware/PinaBio-v2.0-ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.md). Es un proyecto editable de **KiCad 9.0.9**, con esquemático, PCB de cuatro capas, BOM, Gerbers, taladros y posiciones. Mide **84,50 × 53,11 mm**. KiCad 9.0.9 informa **ERC 0, DRC 0, 0 conexiones pendientes y 0 diferencias entre esquemático y PCB**. Los archivos de fabricación son una salida de prototipo; falta la inspección independiente de huellas y la validación eléctrica de la primera placa ensamblada.
+La nueva placa **PINABio "Paca" v.2.0.** se encuentra en [hardware/PinaBio-Paca-v2.0](hardware/PinaBio-Paca-v2.0/README.md). Es un proyecto editable de **KiCad 9.0.9**, con esquemático, PCB de cuatro capas, BOM, Gerbers, taladros y posiciones. Mide **84,50 × 53,11 mm**. KiCad 9.0.9 informa **ERC 0, DRC 0, 0 conexiones pendientes y 0 diferencias entre esquemático y PCB**. Los archivos de fabricación son una salida de prototipo; falta la inspección independiente de huellas y la validación eléctrica de la primera placa ensamblada.
 
 ## Qué lleva
 
@@ -19,11 +19,10 @@ La nueva placa **PINABio "Paca" v.2.0.** se encuentra en [hardware/PinaBio-v2.0-
 
 ## Documentación
 
-- [Proyecto y conexiones de la PCB ChatGPT](hardware/PinaBio-v2.0-ChatGPT/README.md)
+- [Proyecto y conexiones de la PCB](hardware/PinaBio-Paca-v2.0/README.md)
 - [Especificación de hardware](docs/es/especificacion.md)
 - [Alimentación y USB](docs/es/alimentacion-usb.md)
 - [Protocolo y datos](docs/es/protocolo.md)
 - [Comparación con V1](docs/es/comparacion-v1.md)
-- [Diseño de Cursor conservado como referencia](hardware/cursor/PinaBio-v2.0-Cursor/README.md)
 
 **Antes de encargar montaje:** confirmar orientación y dimensiones del USB-C, TPS63070, todos los conectores y el interruptor cableado; medir los tres módulos externos reales; verificar las transiciones ON/OFF/USB y las tensiones del cargador y reguladores. Los informes de KiCad no sustituyen estas pruebas.

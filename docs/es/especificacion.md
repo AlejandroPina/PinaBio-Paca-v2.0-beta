@@ -74,7 +74,7 @@ I²C de ADC (GPIO4/5) opera a 400 kHz con ADS `0x40` y `0x41`; DRDY entra por GP
 
 ## 5. Placa
 
-Cuatro capas. La implementación ChatGPT mide **84,50 × 53,11 mm**; el aumento moderado de anchura permite serigrafiar J3 fuera del conector. El USB-C está en el borde inferior y su boca sobresale del contorno. El ESP32-S3-MINI-1U no lleva antena de circuito impreso: lleva conector U.FL. Ese extremo del módulo queda en el borde superior, lo más salido posible, para que la antena externa quede fuera del cobre. En todas las capas, bajo ese extremo y un poco más allá del borde del módulo hacia fuera, no hay cobre, pistas, vías ni plano. El USB y el buck no se colocan bajo esa zona.
+Cuatro capas. La placa mide **84,50 × 53,11 mm**; la anchura deja sitio para serigrafiar J3 fuera del conector. El USB-C está en el borde inferior y su boca sobresale del contorno. El ESP32-S3-MINI-1U no lleva antena de circuito impreso: lleva conector U.FL. Ese extremo del módulo queda en el borde superior, lo más salido posible, para que la antena externa quede fuera del cobre. En todas las capas, bajo ese extremo y un poco más allá del borde del módulo hacia fuera, no hay cobre, pistas, vías ni plano. El USB y el buck no se colocan bajo esa zona.
 
 Hay dos planos de masa. La masa digital reúne el ESP32, el USB, el BQ24074 y el TPS63070. La masa analógica reúne los ADS122C04, el MCP6004, el divisor de ECG, el GSR y las bandas. Se unen en un solo sitio, corto y ancho, junto a los ADS y al puente de 0 Ω entre `3V3_SYS` y `3V3_A`, de modo que alimentación y retorno coinciden en el mismo punto. No hay varias uniones repartidas ni una pista fina cruzando la placa. Las señales analógicas no cruzan la masa digital. In1 es masa, partida en esas dos zonas. F.Cu lleva el mismo reparto, cosido con vías a su zona. In2 es `3V3_SYS` y no lleva señales de datos. B.Cu lleva las señales.
 
@@ -92,10 +92,10 @@ Los dos nodos del inductor del TPS63070 quedan en F.Cu, sin vía, a 0,40 mm en t
 
 El proyecto KiCad 9.0.9 incluye esquemático, PCB, BOM, Gerbers, taladros y `position.csv`; ERC, DRC y paridad dan cero. Antes de fabricar una tirada se requieren huellas verificadas contra las piezas compradas, revisión de las rutas al cuerpo y del uso previsto del aislador externo, y ensayos de la primera placa.
 
-## 7. Contrato de la implementación ChatGPT
+## 7. Contrato de la implementación
 
 - J3, módulo AD8232 externo: pin 1 AGND/GND, 2 3V3_A/3.3V, 3 ECG_OUT/OUTPUT, 4 LO_N/LO−, 5 LO_P/LO+, 6 3V3_A/SDN. SDN queda siempre habilitado. Es el orden del módulo rojo para un cable plano.
-- J5, CJMCU-30205: pin 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. J9, medidor de batería: JST PH B2B-PH-K-S(LF)(SN), pin 1 BAT+ conmutado, pin 2 GND. Un BSS84LT1G de lado alto y un BSS138LT1G lo activan solo cuando existe 3V3_SYS; 1 MΩ une puerta y fuente del BSS84. J9 se limita a medidores de unas decenas de mA.
+- J5, CJMCU-30205: pin 1 3V0_TEMP, 2 GND, 3 SDA, 4 SCL. J9, medidor de batería: JST PH B2B-PH-K-S(LF)(SN), pin 1 BAT+ conmutado, pin 2 GND. Un BSS84LT1G de lado alto y un BSS138LT1G lo activan solo cuando existe 3V3_SYS; 1 MΩ une puerta y fuente del BSS84. J9 queda reservado al medidor de batería.
 - R39, YAGEO RC0603FR-0710KL de 10 kΩ al 1 %, está en serie entre TPS_EN y el pin EN del TPS63070, pegado al regulador. R12 de 100 kΩ a masa queda del lado del interruptor. PS/SYNC sigue a masa. R3 sigue en 0 Ω.
 - L1 es Coilcraft **XAL4020-152MEC**, 1,5 µH y huella XAL4020 sin cambios; «C» identifica el embalaje de bobina de 7 pulgadas.
 - La serigrafía de J3 está fuera del conector, en una columna alineada con los seis pines. El logo PINA figura en la esquina superior derecha y una copia pequeña acompaña al título «PINABio \"Paca\" v.2.0.» en dos líneas en la zona central derecha. J2 se rotula BATT; las cinco etiquetas de J4 (VIN, GND, SCL, SDA, INT) comparten la misma alineación izquierda. Todos los nombres y etiquetas de pin usan texto de al menos 1,0 mm de altura y 0,15 mm de trazo.
